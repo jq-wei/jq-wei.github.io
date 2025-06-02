@@ -10,7 +10,7 @@
 email: jieqiang.wei.dev@gmail.com # your email address
 # facebook_id: # your facebook id
 # flickr_id: # your flickr id
-# github_username: # your GitHub user name
+github_username: jq-wei # your GitHub user name
 # gitlab_username: # your GitLab user name
 # ieee_id: # your ieeexplore.ieee.org/author/id
 # inspirehep_id: 1010907 # Inspire HEP author ID
@@ -46,6 +46,6 @@ scholar_userid: 5ClEDSoAAAAJ # your Google Scholar ID
 # youtube_id: # your youtube channel id (youtube.com/@<youtube_id>)
 # zotero_username: # your zotero username
 custom_social: # can be any name here other than the ones already defined above
-  logo: https://en.m.wikipedia.org/wiki/File:Google_Patents_logo.png #https://www.alberteinstein.com/wp-content/uploads/2024/03/cropped-favicon-192x192.png # can be png, svg, jpg
+  logo: https://upload.wikimedia.org/wikipedia/commons/8/8f/Google_Patents_logo.png #https://www.alberteinstein.com/wp-content/uploads/2024/03/cropped-favicon-192x192.png # can be png, svg, jpg
   title: Custom Social
   url: https://www.alberteinstein.com/
