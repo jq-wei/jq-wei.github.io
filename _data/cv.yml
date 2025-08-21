@@ -2,25 +2,20 @@
   type: map
   contents:
     - name: Full Name
-      value: Albert Einstein
+      value: Jieqiang Wei
     - name: Date of Birth
-      value: 14th March 1879
+      value: 1987 May
     - name: Languages
-      value: English, German
+      value: English, Chinese
 
 - title: Education
   type: time_table
   contents:
-    - title: PhD
-      institution: University of Zurich, Zurich, Switzerland
+    - title: PhD in Applied Mathematics
+      institution: Institute of mathematics and computer sciences, University of Groningen, The Netherlands
       year: 1905
       description:
-        - Description 1.
-        - Description 2.
-        - title: Description 3.
-          contents:
-            - Sub-description 1.
-            - Sub-description 2.
+        - Optimization and control of multi-agent systems
     - title: Federal teaching diploma
       institution: Eidgenössische Technische Hochschule, Zurich, Switzerland
       year: 1900
