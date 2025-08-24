@@ -13,7 +13,11 @@
       "position": "Principle Machine Learning Engineer, GenAI",
       "startDate": "2024",
       "endDate": "2025",
-      "summary": "Optimization on Xiaoyi, specifically on: RAG system optimization using KV cache reuse mechanism; hardware-based inference acceleration for decoding attention kernel based on Ascend NPU architecture."
+      "summary": "Optimization on Xiaoyi.",
+      "highlights": [
+        "RAG system optimization using KV cache reuse mechanism",
+        "Hardware-based inference acceleration for decoding attention kernel based on Ascend NPU architecture"
+      ]
     },
     {
       "name": "Ericsson, GAIA",
