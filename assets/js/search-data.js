@@ -53,16 +53,13 @@ ninja.data = [{
           description: "",
           section: "Books",handler: () => {
               window.location.href = "/books/the_godfather/";
-            },},{id: "news-a-simple-inline-announcement",
-          title: 'A simple inline announcement.',
-          description: "",
-          section: "News",},{id: "news-a-long-announcement-with-details",
-          title: 'A long announcement with details',
+            },},{id: "news-main-topics-i-worked-on-in-hkrc-huawei",
+          title: 'Main topics I worked on in HKRC Huawei',
           description: "",
           section: "News",handler: () => {
               window.location.href = "/news/announcement_2/";
-            },},{id: "news-a-simple-inline-announcement-with-markdown-emoji-sparkles-smile",
-          title: 'A simple inline announcement with Markdown emoji! :sparkles: :smile:',
+            },},{id: "news-i-will-join-eqt-group-to-develop-ai-solutions-in-finance",
+          title: 'I will join EQT group to develop AI solutions in Finance.',
           description: "",
           section: "News",},{id: "projects-project-1",
           title: 'project 1',
