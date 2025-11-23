@@ -87,7 +87,7 @@ bing_site_verification: # out your bing-site-verification ID (Bing Webmaster)
 # -----------------------------------------------------------------------------
 
 blog_name: Jay's Blog # blog_name will be displayed in your blog page
-blog_description: Here I document my learning note, as well as some of my calligraphy stuff.
+blog_description: Here I document my learning/research notes, as well as some of my calligraphy stuff.
 permalink: /blog/:year/:title/
 lsi: false # produce an index for related posts
 
