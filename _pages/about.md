@@ -27,5 +27,4 @@ latest_posts:
   limit: 3 # leave blank to include all the blog posts
 ---
 
-Welcome to my homepage! 🌍  This site hosts updates on my projects, research, and occasional writings. Have a look around, and feel free to get in touch.
-
+Welcome to my homepage! 🌍 This site hosts updates on my projects, research, and occasional writings. Have a look around, and feel free to get in touch.
