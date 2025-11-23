@@ -13,8 +13,6 @@ related_posts: false
     <li>SFT (32B model) pipeline which guarantees the accuracy loss < 1%</li>
 </ul>
 
-
-
 #### Hardware-based inference optimization
 
 <ul>
