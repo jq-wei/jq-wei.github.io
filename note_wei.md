@@ -1,6 +1,6 @@
 # how to use
 
-1. make the modifications and push. Github will automatically compile and deploy which takes about 5 mins. 
+1. make the modifications and push (to the main branch). Github will automatically compile and deploy which takes about 5 mins. 
 
 # Project pages
 
