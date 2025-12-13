@@ -113,26 +113,27 @@ We start with 12 tokens (`<|im_start|>user\nHow are you?<|im_end|>\n<|im_start|>
   - `seq_len = hidden_states.shape[1] = key_states.shape[2] >1`
   - For Qwen3, `past_key_values` is of class `DynamicCache`
   - before we enter a decoderLayer, the `past_key_values` of that layer is not None, but empty, i.e.,
-  ```python
-  # we only check 0-th layer.
 
-  if self.layer_idx == 0:
-    seq_len = query_states.shape[2]
-    stage = "PREFILL" if seq_len > 1 else "DECODE"
+```python
+# we only check 0-th layer.
 
-    if past_key_values is not None:
-        # Check cache length BEFORE update
-        cache_len_before = past_key_values.get_seq_length(self.layer_idx)  # 0
-
+if self.layer_idx == 0:
+  seq_len = query_states.shape[2]
+  stage = "PREFILL" if seq_len > 1 else "DECODE"
 
   if past_key_values is not None:
-    # sin and cos are specific to RoPE models; cache_position needed for the static cache
-    cache_kwargs = {"sin": sin, "cos": cos, "cache_position": cache_position}
-    key_states, value_states = past_key_values.update(key_states, value_states, self.layer_idx, cache_kwargs)
+      # Check cache length BEFORE update
+      cache_len_before = past_key_values.get_seq_length(self.layer_idx)  # 0
 
-    if self.layer_idx == 0:
-        cache_len_after = past_key_values.get_seq_length(self.layer_idx) # 12
-  ```
+
+if past_key_values is not None:
+  # sin and cos are specific to RoPE models; cache_position needed for the static cache
+  cache_kwargs = {"sin": sin, "cos": cos, "cache_position": cache_position}
+  key_states, value_states = past_key_values.update(key_states, value_states, self.layer_idx, cache_kwargs)
+
+  if self.layer_idx == 0:
+      cache_len_after = past_key_values.get_seq_length(self.layer_idx) # 12
+```
 
 This can be imagined as drawer opening for a closet, if the drawer is empty, put the KV there and move on to above layer.
 
