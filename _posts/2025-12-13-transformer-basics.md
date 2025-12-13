@@ -11,15 +11,13 @@ toc:
   sidebar: left
 ---
 
-# Transformer basics
-
 Here we review the data flow of transformer architecture. This is a 2-D problem: one from the perspective of model layers; one from the sequence of the tokens.
 
 # Model architecture
 
 In this part, we only look at a simplified version of transformer, namely decoder-only transformer.
 
-![Screenshot 2025-12-08 at 23.12.31.png](/assets/img/transformer-basics/Screenshot_2025-12-08_at_23.12.31.png)
+<img src="/assets/img/transformer-basics/Screenshot_2025-12-08_at_23.12.31.png" width="60%" alt="Screenshot 2025-12-08 at 23.12.31.png">
 
 ## Token embedding
 
@@ -61,7 +59,7 @@ where $H_i$ is the set of attention heads at layer $i$.
 
 Here we use the index $i$ to indicate this is calculation on layer $i$. The full picture is simplified as
 
-![Screenshot 2025-12-09 at 10.49.44.png](/assets/img/transformer-basics/Screenshot_2025-12-09_at_10.49.44.png)
+<img src="/assets/img/transformer-basics/Screenshot_2025-12-09_at_10.49.44.png" width="60%" alt="Screenshot 2025-12-09 at 10.49.44.png">
 
 Here $x_i, x_{i+1}, x_{i+2} \in\mathbb{R}^{n_{context}\times d_{model}}$
 
