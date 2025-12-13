@@ -143,7 +143,7 @@ This can be imagined as drawer opening for a closet, if the drawer is empty, put
   - Before we enter a layer, the `past_key_values` of that layer is none empty. For example, we generate one new token after prefill, and now we are at layer 0. The `past_key_values` of this layer has 12 (13) key and values before (after) `past_key_values.update(key_states, value_states, self.layer_idx, cache_kwargs)`
   - This basically expand the lower-triangle attention matrix (`attn_weights`) by one more row.
 
-## Qwen3 analogies
+# Qwen3 analogies
 
 In this part, we verify the tensor-flow using a minimal inference logic:
 
