@@ -37,7 +37,18 @@ ninja.data = [{
               handler: () => {
                 window.location.href = "/blog/";
               },
-            },{id: "post-hipporag-neurobiologically-inspired-long-term-memory-for-llms",
+            },{id: "post-transformer-basics-architecture-and-data-flow",
+        
+          title: "Transformer Basics: Architecture and Data Flow",
+        
+        description: "Understanding the transformer architecture from model layers and token sequence perspectives",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2025/transformer-basics/";
+          
+        },
+      },{id: "post-hipporag-neurobiologically-inspired-long-term-memory-for-llms",
         
           title: "HippoRAG: Neurobiologically Inspired Long-Term Memory for LLMs",
         
