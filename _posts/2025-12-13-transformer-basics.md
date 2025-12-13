@@ -89,7 +89,7 @@ After the calculation of the Attention, there is a projection process to make th
 
 After the last layer of the decoder, some calculations are needed to derive the final probability distribution of the next token (this part can be different for training/sft).
 
-For inference only (no matter prefill or decoding), we only need the last or latest token hidden_state to predict the next token. In this case we do a slice of the final hidden_states (`logits_to_keep = 1`) (TODO: run a llamafactory sft to verify, especially `logits_to_keep` can be larger than 1 !!!!!!!! )
+For inference only (no matter prefill or decoding), we only need the last or latest token hidden_state to predict the next token. In this case we do a slice of the final hidden_states (`logits_to_keep = 1`).
 
 In equations,
 
