@@ -258,7 +258,7 @@ This the fundamental alg for Google to rank millions webpages. This is based on 
 
 # markov chain
 
-![Screenshot 2025-11-18 at 14.56.17.png](/assets/img/hipporag/Screenshot_2025-11-18_at_14.56.17.png)
+<img src="/assets/img/hipporag/Screenshot_2025-11-18_at_14.56.17.png" width="40%" alt="Screenshot 2025-11-18 at 14.56.17.png">
 
 Then the distribution of being each node is governed by
 
@@ -304,11 +304,11 @@ But with some variation:
 
 1. Webpage with NO outgoing links. All eventually stop at that node
 
-   ![Screenshot 2025-11-18 at 15.10.27.png](/assets/img/hipporag/Screenshot_2025-11-18_at_15.10.27.png)
+   <img src="/assets/img/hipporag/Screenshot_2025-11-18_at_15.10.27.png" width="40%" alt="Screenshot 2025-11-18 at 15.10.27.png">
 
 2. Cycles: Also end up with state 1 and 2, oscillating forever.
 
-   ![Screenshot 2025-11-18 at 15.11.18.png](/assets/img/hipporag/Screenshot_2025-11-18_at_15.11.18.png)
+<img src="/assets/img/hipporag/Screenshot_2025-11-18_at_15.11.18.png" width="40%" alt="Screenshot 2025-11-18 at 15.11.18.png">
 
 PageRank is handling with Markov Chains that are NOT irreducible and aperiodic!
 
@@ -318,7 +318,7 @@ Step 1. Given a parameter $\alpha\in(0,1)$, with probability $\frac{\alpha}{N}$ 
 
 For example
 
-![Screenshot 2025-11-18 at 15.17.15.png](/assets/img/hipporag/Screenshot_2025-11-18_at_15.17.15.png)
+<img src="/assets/img/hipporag/Screenshot_2025-11-18_at_15.17.15.png" width="40%" alt="Screenshot 2025-11-18 at 15.17.15.png">
 
 But now, the probability sum is NOT 1 anymore.
 
