@@ -49,7 +49,7 @@ $E:$ relation edges
 
 Step 1: use L to extract N, the prompt is as the follows:
 
-![Screenshot 2025-11-18 at 13.17.19.png](/assets/img/hipporag/Screenshot_2025-11-18_at_13.17.19.png)
+<img src="/assets/img/hipporag/Screenshot_2025-11-18_at_13.17.19.png" width="60%" alt="Screenshot 2025-11-18 at 13.17.19.png">
 
 Step 2: and use OpenIE (an NLP LLM) to extract the triplet. This will create relation edges E among all the entities (within this passage). This relation is of type **Fact**.
 
