@@ -67,7 +67,7 @@ Next, let us move on the attention calculation part.
 
 ### Attention
 
-The attention (output) is given byU
+The attention (output) is given by
 
 $$
 \mathtt{Attention}(Q,K,V) = \mathtt{softmax}(\frac{QK^T}{\sqrt{d_k}})V
