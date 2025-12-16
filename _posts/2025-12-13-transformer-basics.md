@@ -51,7 +51,7 @@ For this part we only focus the multi-head attention and MLP part after it, and 
 
 In mathematic term, this part essentially does
 
-- Each attention head$h$$x_{i+1} = x_i + \sum_{h\in H_i} h(x_i)$
+- Each attention head $h$, the latent state updates according to $x_{i+1} = x_i + \sum_{h\in H_i} h(x_i)$
 
 where $H_i$ is the set of attention heads at layer $i$.
 
