@@ -37,7 +37,18 @@ ninja.data = [{
               handler: () => {
                 window.location.href = "/blog/";
               },
-            },{id: "post-transformer-basics-architecture-and-data-flow",
+            },{id: "post-a-survey-on-in-context-learning",
+        
+          title: "A Survey on In-Context Learning",
+        
+        description: "Survey notes on in-context learning (ICL) - a paradigm for LLMs to learn tasks from few examples without parameter updates. Covers ICL mechanisms, prompt engineering, and comparison of causalLM vs prefixLM.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2025/in-context-learning-survey/";
+          
+        },
+      },{id: "post-transformer-basics-architecture-and-data-flow",
         
           title: "Transformer Basics: Architecture and Data Flow",
         
