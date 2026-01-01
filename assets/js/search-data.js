@@ -37,7 +37,18 @@ ninja.data = [{
               handler: () => {
                 window.location.href = "/blog/";
               },
-            },{id: "post-a-survey-on-in-context-learning",
+            },{id: "post-react-synergizing-reasoning-and-acting-in-language-models",
+        
+          title: "ReAct: Synergizing Reasoning and Acting in Language Models",
+        
+        description: "Notes on ReAct - a paradigm for LLM agents that combines reasoning traces and task-specific actions. Covers prompt engineering, fine-tuning approaches, and implementation of zero-shot ReAct agents with LangChain.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/react-synergizing-reasoning-acting/";
+          
+        },
+      },{id: "post-a-survey-on-in-context-learning",
         
           title: "A Survey on In-Context Learning",
         
