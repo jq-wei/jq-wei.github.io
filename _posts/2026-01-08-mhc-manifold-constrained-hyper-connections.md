@@ -1,6 +1,9 @@
 ---
 layout: post
-title: "mHC: Manifold-Constrained Hyper-Connections"
+titl  - hard to scale
+  - more memory access overhead
+  - this is because HC compromise residual connection's identity mapping property
+- Solution: manifold constrained HC by projecting HC onto a manifold to ensure stabilitymHC: Manifold-Constrained Hyper-Connections"
 date: 2026-01-08
 description: "Notes on DeepSeek's mHC paper - extending residual connections with Hyper-Connections constrained on double stochastic matrix manifolds for stability. Covers implementation with Sinkhorn-Knopp algorithm and performance improvements."
 tags: deep-learning residual-connections hyper-connections transformer stability deepseek
@@ -15,16 +18,15 @@ toc:
 
 The key points of this paper are
 
-- residual connection is ubiquitous (无处不在的). This is a paradigm since ResNet?
+- residual connection is ubiquitous. This is a paradigm since ResNet?
 - Hyper-Connection extend residual connection
   - can have substantial performance gain
   - but unstable for training
   - hard to scale
   - more memory access overhead
-  - this is because HC compromise （破坏）residual connection’s identity mapping property
+  - this is because HC compromise residual connection’s identity mapping property
 - Solution: manifold constrained HC by projecting HC onto a manifold to ensure stability
-    <img src="/assets/img/mhc/Screenshot_2026-01-07_at_23.03.03.png" width="60%" alt="Screenshot 2026-01-07 at 23.03.03.png">
-
+  <img src="/assets/img/mhc/Screenshot_2026-01-07_at_23.03.03.png" width="60%" alt="Screenshot 2026-01-07 at 23.03.03.png">
 
 # Main Method
 
