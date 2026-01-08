@@ -81,7 +81,9 @@ where:
 
 - $\alpha\in \mathbb{R}$ are learnable, initialized to small values
 - $\theta_{l}^{\text{pre}}, \theta_{l}^{\text{post}} \in\mathbb{R}^{1\times C}$ and $\theta_{l}^{\text{res}} \in\mathbb{R}^{n\times C}$
-- $\mathbf{b}_{l}^{\text{pre}}, \mathbf{b}_{l}^{\text{post}} \in\mathbb{R}^{1\times n}$ and $\mathbf{b}_{l}^{\text{res}} \in\mathbb{R}^{n\times n}$ are learnable bias, which are initialized to zero (usually).
+- $\mathbf{b}_{l}^{\text{pre}}, \mathbf{b}_{l}^{\text{post}} \in\mathbb{R}^{1\times n}$ and $\mathbf{b}_{l}^{\text{res}} \in\mathbb{R}^{n\times n}$ are learnable bias.
+
+  These are initialized to zero (usually).
 
 The author also did an ablation study of HC, and confirms that the expanded residual connection contribute the most to the performance gain.
 
