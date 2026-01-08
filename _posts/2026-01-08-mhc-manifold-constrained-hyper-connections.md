@@ -36,7 +36,9 @@ $$
 \mathbf{x}_{l+1} = \mathbf{x}_{l} + \mathcal{F}(\mathbf{x}_{l}, \mathcal{W}_l)
 $$
 
-For simplicity, we can think of $\mathbf{x}_l \in\mathbb{R}^C$. This corresponding to the Transformer with model dimension being $1$. In fact, for any RNN type of neural network, $\mathbf{x}_l$ is the hidden states of the existing $C$ tokens. $\mathcal{F}(\cdot, \mathcal{W}_{l})$ can be simple matrix multiplication like MLP, or more complicated calculation like attention mechanisms.
+For simplicity, we can think of $\mathbf{x}_l \in\mathbb{R}^C$. This corresponding to the Transformer with model dimension being $1$.
+
+In fact, for any RNN type of neural network, $\mathbf{x}_l$ is the hidden states of the existing $C$ tokens. $\mathcal{F}(\cdot, \mathcal{W}_{l})$ can be simple matrix multiplication like MLP, or more complicated calculation like attention mechanisms.
 
 Note that when we have multiple layers, the network becomes
 
@@ -60,7 +62,7 @@ where we have
 
 - $\mathbf{x}_l\in\mathbb{R}^{n\times C}$ is the expanded hidden state and $n$ is the expansion rate
 - $\mathcal{H}_{l}^{\text{res}}\in\mathbb{R}^{n\times n}$ is a learnable mapping as feature mixture in the residual connection
-- in order to keep the remaining part of the neural network unchanged, we need to map $\mathbf{x}_l$ in $\mathcal{F}$ to match the weights $\mathcal{W}_l$, this introduce two more learnable mapping $\mathcal{H}_{l}^{\text{pre}}, \mathcal{H}_{l}^{\text{post}}\in\mathbb{R}^{1\times n}$.
+- in order to keep the remaining part of the neural network unchanged, we need to map $\mathbf{x}_l$ in $\mathcal{F}$ to match the weights $\mathcal{W}_l$. This introduces two more learnable mappings: $\mathcal{H}_{l}^{\text{pre}}, \mathcal{H}_{l}^{\text{post}}\in\mathbb{R}^{1\times n}$.
 
 Now the multiple layers network with HC becomes
 
@@ -74,7 +76,11 @@ $$
 \begin{cases}\tilde{\mathbf{x}}_{l} = \text{RMSNorm}(\mathbf{x}_{l}) \\\mathcal{H}_{l}^{\text{pre}} = \alpha_{l}^{\text{pre}} \cdot \tanh(\theta_{l}^{\text{pre}} \tilde{\mathbf{x}}_{l}^{\top}) + \mathbf{b}_{l}^{\text{pre}} \\\mathcal{H}_{l}^{\text{post}} = \alpha_{l}^{\text{post}} \cdot \tanh(\theta_{l}^{\text{post}} \tilde{\mathbf{x}}_{l}^{\top}) + \mathbf{b}_{l}^{\text{post}} \\\mathcal{H}_{l}^{\text{res}} = \alpha_{l}^{\text{res}} \cdot \tanh(\theta_{l}^{\text{res}} \tilde{\mathbf{x}}_{l}^{\top}) + \mathbf{b}_{l}^{\text{res}},\end{cases}
 $$
 
-where $\alpha\in \mathbb{R}$ are learnable, initialized to small values; $\theta_{l}^{\text{pre}}, \theta_{l}^{\text{post}} \in\mathbb{R}^{1\times C}$ and $\theta_{l}^{\text{res}} \in\mathbb{R}^{n\times C}$; $\mathbf{b}_{l}^{\text{pre}}, \mathbf{b}_{l}^{\text{post}} \in\mathbb{R}^{1\times n}$ and $\mathbf{b}_{l}^{\text{res}} \in\mathbb{R}^{n\times n}$ are learnable bias, which are initialized zero (usually).
+where:
+
+- $\alpha\in \mathbb{R}$ are learnable, initialized to small values
+- $\theta_{l}^{\text{pre}}, \theta_{l}^{\text{post}} \in\mathbb{R}^{1\times C}$ and $\theta_{l}^{\text{res}} \in\mathbb{R}^{n\times C}$
+- $\mathbf{b}_{l}^{\text{pre}}, \mathbf{b}_{l}^{\text{post}} \in\mathbb{R}^{1\times n}$ and $\mathbf{b}_{l}^{\text{res}} \in\mathbb{R}^{n\times n}$ are learnable bias, which are initialized to zero (usually).
 
 The author also did an ablation study of HC, and confirms that the expanded residual connection contribute the most to the performance gain.
 
@@ -100,7 +106,11 @@ $$
 \begin{cases}\vec{\mathbf{x}}'_{l} = \text{RMSNorm}(\vec{\mathbf{x}}_{l}) \\\tilde{\mathcal{H}}_{l}^{\text{pre}} = \alpha_{l}^{\text{pre}} \cdot (\vec{\mathbf{x}}'_{l} \varphi_{l}^{\text{pre}}) + \mathbf{b}_{l}^{\text{pre}} \\\tilde{\mathcal{H}}_{l}^{\text{post}} = \alpha_{l}^{\text{post}} \cdot (\vec{\mathbf{x}}'_{l} \varphi_{l}^{\text{post}}) + \mathbf{b}_{l}^{\text{post}} \\\tilde{\mathcal{H}}_{l}^{\text{res}} = \alpha_{l}^{\text{res}} \cdot \text{mat}(\vec{\mathbf{x}}'_{l} \varphi_{l}^{\text{res}}) + \mathbf{b}_{l}^{\text{res}},\end{cases}
 $$
 
-where $\vec{\mathbf{x}}_{l} = \text{vec}(\mathbf{x}_{l}) \in \mathbb{R}^{1 \times nC}$ is the flattened vector; $\varphi_{l}^{\text{pre}}, \varphi_{l}^{\text{post}} \in \mathbb{R}^{nC \times n}$ , and $\varphi_{l}^{\text{res}} \in \mathbb{R}^{nC \times n^{2}}$ learnable weights; $\text{mat}$ is a reshape func from $\mathbb{R}^{1 \times n^{2}}$ to $\mathbb{R}^{n \times n}$.
+where:
+
+- $\vec{\mathbf{x}}_{l} = \text{vec}(\mathbf{x}_{l}) \in \mathbb{R}^{1 \times nC}$ is the flattened vector
+- $\varphi_{l}^{\text{pre}}, \varphi_{l}^{\text{post}} \in \mathbb{R}^{nC \times n}$ and $\varphi_{l}^{\text{res}} \in \mathbb{R}^{nC \times n^{2}}$ are learnable weights
+- $\text{mat}$ is a reshape func from $\mathbb{R}^{1 \times n^{2}}$ to $\mathbb{R}^{n \times n}$
 
 1. Then do the constrained mapping
 
@@ -111,8 +121,8 @@ $$
 where $\sigma$ is the sigmoid function and the $\text{Sinkhorn-Knopp}$ operator is working as the following:
 
 1. initialize with $\mathbf{M}^{(0)} = \text{exp}(\tilde{\mathcal{H}}_{l}^{\text{res}})$
-2. $\mathbf{M}^{(t)} = \mathcal{T}_{r}\left( \mathcal{T}_{c}(\mathbf{M}^{(t-1)}) \right)$ until converge, where $\mathcal{T}_{r}, \mathcal{T}_{c}$ are row and column normalization, respectively
-3. denote the final result as $\mathcal{H}_{l}^{\text{res}} = \lim_{t\rightarrow \infty} \mathbf{M}^{(t)}$. Practically, take $t_{\max} =20.$
+2. iterate $\mathbf{M}^{(t)} = \mathcal{T}_{r}\left( \mathcal{T}_{c}(\mathbf{M}^{(t-1)}) \right)$ until converge, where $\mathcal{T}_{r}, \mathcal{T}_{c}$ are row and column normalization, respectively
+3. denote the final result as $\mathcal{H}_{l}^{\text{res}} = \lim_{t\rightarrow \infty} \mathbf{M}^{(t)}$. Practically, take $t_{\max} =20$.
 
 The code implementation of $\text{Sinkhorn-Knopp}$ opt can be as
 
@@ -133,7 +143,9 @@ The benefits of using double stochastic $\mathcal{H}_{l}^{\text{post}}$ are norm
 
 ### why 2 ?
 
-In the mapping of mHC, the factor 2 in post projection is to make the $\mathcal{H}_{l}^{\text{post}}$ close to uniform matrix when the elements of $\tilde{\mathcal{H}}_{l}^{\text{post}}$ close to zero, since $\sigma(0) = 0.5.$
+In the mapping of mHC, the factor 2 in post projection is to make the $\mathcal{H}_{l}^{\text{post}}$ close to uniform matrix when the elements of $\tilde{\mathcal{H}}_{l}^{\text{post}}$ are close to zero.
+
+This is because $\sigma(0) = 0.5$.
 
 # Performance
 
