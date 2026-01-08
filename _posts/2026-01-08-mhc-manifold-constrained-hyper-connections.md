@@ -1,9 +1,6 @@
 ---
 layout: post
-titl  - hard to scale
-  - more memory access overhead
-  - this is because HC compromise residual connection's identity mapping property
-- Solution: manifold constrained HC by projecting HC onto a manifold to ensure stabilitymHC: Manifold-Constrained Hyper-Connections"
+title: "mHC: Manifold-Constrained Hyper-Connections"
 date: 2026-01-08
 description: "Notes on DeepSeek's mHC paper - extending residual connections with Hyper-Connections constrained on double stochastic matrix manifolds for stability. Covers implementation with Sinkhorn-Knopp algorithm and performance improvements."
 tags: deep-learning residual-connections hyper-connections transformer stability deepseek
