@@ -37,7 +37,18 @@ ninja.data = [{
               handler: () => {
                 window.location.href = "/blog/";
               },
-            },{id: "post-react-synergizing-reasoning-and-acting-in-language-models",
+            },{id: "post-mhc-manifold-constrained-hyper-connections",
+        
+          title: "mHC: Manifold-Constrained Hyper-Connections",
+        
+        description: "Notes on DeepSeek&#39;s mHC paper - extending residual connections with Hyper-Connections constrained on double stochastic matrix manifolds for stability. Covers implementation with Sinkhorn-Knopp algorithm and performance improvements.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/mhc-manifold-constrained-hyper-connections/";
+          
+        },
+      },{id: "post-react-synergizing-reasoning-and-acting-in-language-models",
         
           title: "ReAct: Synergizing Reasoning and Acting in Language Models",
         
