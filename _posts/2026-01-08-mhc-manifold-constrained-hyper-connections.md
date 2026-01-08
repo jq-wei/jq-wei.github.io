@@ -151,9 +151,9 @@ The benefits of using double stochastic $\mathcal{H}_{l}^{\text{post}}$ are norm
 
 ### why 2 ?
 
-In the mapping of mHC, the factor 2 in post projection is to make the $\mathcal{H}_{l}^{\text{post}}$ close to uniform matrix when the elements of $\tilde{\mathcal{H}}_{l}^{\text{post}}$ are close to zero.
+In the mapping of mHC, the factor 2 in post projection is to make the $\mathcal{H}_{l}^{\text{post}}$ close to uniform matrix.
 
-This is because $\sigma(0) = 0.5$.
+This happens when the elements of $\tilde{\mathcal{H}}_{l}^{\text{post}}$ are close to zero for example at initialization. This is because $\sigma(0) = 0.5$.
 
 # Performance
 
