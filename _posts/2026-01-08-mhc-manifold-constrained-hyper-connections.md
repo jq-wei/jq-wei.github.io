@@ -61,9 +61,9 @@ where we have
 
 - $\mathbf{x}_l\in\mathbb{R}^{n\times C}$ is the expanded hidden state and $n$ is the expansion rate
 - $\mathcal{H}_{l}^{\text{res}}\in\mathbb{R}^{n\times n}$ is a learnable mapping as feature mixture in the residual connection
-- in order to keep the remaining part of the neural network unchanged, we need to map $\mathbf{x}_l$ in $\mathcal{F}$ to match the weights $\mathcal{W}_l$. This introduces two more learnable mappings:
-
-$\mathcal{H}_{l}^{\text{pre}}, \mathcal{H}_{l}^{\text{post}}\in\mathbb{R}^{1\times n}$.
+- in order to keep the remaining part of the neural network unchanged, we need to map $\mathbf{x}_l$ in $\mathcal{F}$ to match the weights $\mathcal{W}_l$.
+  This introduces two more learnable mappings:
+  $\mathcal{H}_{l}^{\text{pre}}, \mathcal{H}_{l}^{\text{post}}\in\mathbb{R}^{1\times n}$.
 
 Now the multiple layers network with HC becomes
 
