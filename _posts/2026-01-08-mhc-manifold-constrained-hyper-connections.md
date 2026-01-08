@@ -124,8 +124,13 @@ $$
 where $\sigma$ is the sigmoid function and the $\text{Sinkhorn-Knopp}$ operator is working as the following:
 
 1. initialize with $\mathbf{M}^{(0)} = \text{exp}(\tilde{\mathcal{H}}_{l}^{\text{res}})$
-2. iterate $\mathbf{M}^{(t)} = \mathcal{T}_{r}\left( \mathcal{T}_{c}(\mathbf{M}^{(t-1)}) \right)$ until converge, where $\mathcal{T}_{r}, \mathcal{T}_{c}$ are row and column normalization, respectively
-3. denote the final result as $\mathcal{H}_{l}^{\text{res}} = \lim_{t\rightarrow \infty} \mathbf{M}^{(t)}$. Practically, take $t_{\max} =20$.
+2. iterate $\mathbf{M}^{(t)} = \mathcal{T}_{r}\left( \mathcal{T}_{c}(\mathbf{M}^{(t-1)}) \right)$ until converge.
+
+   Where $\mathcal{T}_{r}, \mathcal{T}_{c}$ are row and column normalization, respectively.
+
+3. denote the final result as $\mathcal{H}_{l}^{\text{res}} = \lim_{t\rightarrow \infty} \mathbf{M}^{(t)}$.
+
+   Practically, take $t_{\max} =20$.
 
 The code implementation of $\text{Sinkhorn-Knopp}$ opt can be as
 
