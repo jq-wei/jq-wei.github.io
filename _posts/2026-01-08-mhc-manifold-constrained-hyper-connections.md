@@ -35,7 +35,9 @@ $$
 
 For simplicity, we can think of $\mathbf{x}_l \in\mathbb{R}^C$. This corresponding to the Transformer with model dimension being $1$.
 
-In fact, for any RNN type of neural network, $\mathbf{x}_l$ is the hidden states of the existing $C$ tokens. $\mathcal{F}(\cdot, \mathcal{W}_{l})$ can be simple matrix multiplication like MLP, or more complicated calculation like attention mechanisms.
+In fact, for any RNN type of neural network, $\mathbf{x}_l$ is the hidden states of the existing $C$ tokens.
+
+The function $\mathcal{F}(\cdot, \mathcal{W}_{l})$ can be simple matrix multiplication like MLP, or more complicated calculation like attention mechanisms.
 
 Note that when we have multiple layers, the network becomes
 
