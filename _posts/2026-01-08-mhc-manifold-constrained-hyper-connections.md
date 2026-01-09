@@ -59,10 +59,10 @@ $$
 
 where we have
 
-- $\mathbf{x}_l\in\mathbb{R}^{n\times C}$ is the expanded hidden state and $n$ is the expansion rate
+- $\mathbf{x}\_{l}\in\mathbb{R}^{n\times C}$ is the expanded hidden state and $n$ is the expansion rate
 - $\mathcal{H}_{l}^{\text{res}}\in\mathbb{R}^{n\times n}$ is a learnable mapping as feature mixture in the residual connection
 
-In order to keep the remaining part of the neural network unchanged, we need to map $\mathbf{x}_l$ in $\mathcal{F}$ to match the weights $\mathcal{W}_l$. This introduces two more learnable mappings:
+In order to keep the remaining part of the neural network unchanged, we need to map $\mathbf{x}\_{l}$ in $\mathcal{F}$ to match the weights $\mathcal{W}_{l}$. This introduces two more learnable mappings:
 $$\mathcal{H}_{l}^{\text{pre}}, \mathcal{H}_{l}^{\text{post}}\in\mathbb{R}^{1\times n}$$.
 
 Now the multiple layers network with HC becomes
@@ -110,7 +110,7 @@ $$
 
 where:
 
-- $\vec{\mathbf{x}}_{l}=\text{vec}(\mathbf{x}_{l})\in\mathbb{R}^{1 \times nC}$ is the flattened vector
+- $\vec{\mathbf{x}}\_{l}=\text{vec}(\mathbf{x}\_{l})\in\mathbb{R}^{1 \times nC}$ is the flattened vector
 - $\varphi_{l}^{\text{pre}}, \varphi_{l}^{\text{post}} \in \mathbb{R}^{nC \times n}$ and $\varphi_{l}^{\text{res}} \in \mathbb{R}^{nC \times n^{2}}$ are learnable weights
 - $\text{mat}$ is a reshape func from $\mathbb{R}^{1 \times n^{2}}$ to $\mathbb{R}^{n \times n}$
 
