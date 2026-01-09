@@ -59,10 +59,10 @@ $$
 
 where we have
 
-- $\mathbf{x}\_{l}\in\mathbb{R}^{n\times C}$ is the expanded hidden state and $n$ is the expansion rate
+- $\mathbf{x}_l\in\mathbb{R}^{n\times C}$ is the expanded hidden state and $n$ is the expansion rate
 - $\mathcal{H}_{l}^{\text{res}}\in\mathbb{R}^{n\times n}$ is a learnable mapping as feature mixture in the residual connection
 
-In order to keep the remaining part of the neural network unchanged, we need to map $\mathbf{x}\_{l}$ in $\mathcal{F}$ to match the weights $\mathcal{W}_{l}$. This introduces two more learnable mappings:
+In order to keep the remaining part of the neural network unchanged, we need to map $\mathbf{x}_l$ in $\mathcal{F}$ to match the weights $\mathcal{W}_l$. This introduces two more learnable mappings:
 $$\mathcal{H}_{l}^{\text{pre}}, \mathcal{H}_{l}^{\text{post}}\in\mathbb{R}^{1\times n}$$.
 
 Now the multiple layers network with HC becomes
@@ -122,14 +122,10 @@ $$
 
 where $\sigma$ is the sigmoid function and the $\text{Sinkhorn-Knopp}$ operator is working as the following:
 
-1. initialize with $\mathbf{M}^{(0)} = \text{exp}(\tilde{\mathcal{H}}_{l}^{\text{res}})$
-2. iterate $\mathbf{M}^{(t)} = \mathcal{T}_{r}\left( \mathcal{T}_{c}(\mathbf{M}^{(t-1)}) \right)$ until converge.
+1. initialize with $\mathbf{M}^{(0)} = \text{exp}(\tilde{\mathcal{H}}\_{l}^{\text{res}})$
+2. iterate $\mathbf{M}\^{(t)} = \mathcal{T}\_{r}\left( \mathcal{T}\_{c}(\mathbf{M}\^{(t-1)}) \right)$ until converge where $\mathcal{T}\_{r}, \mathcal{T}\_{c}$ are row and column normalization, respectively.
 
-   Where $\mathcal{T}_{r}, \mathcal{T}_{c}$ are row and column normalization, respectively.
-
-3. denote the final result as $\mathcal{H}_{l}^{\text{res}} = \lim_{t\rightarrow \infty} \mathbf{M}^{(t)}$.
-
-   Practically, take $t_{\max} =20$.
+3. denote the final result as $\mathcal{H}\_{l}^{\text{res}} = \lim\_{t\rightarrow \infty} \mathbf{M}\^{(t)}$. Practically, take $t\_{\max} =20$.
 
 The code implementation of $\text{Sinkhorn-Knopp}$ opt can be as
 
