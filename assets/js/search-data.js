@@ -37,7 +37,18 @@ ninja.data = [{
               handler: () => {
                 window.location.href = "/blog/";
               },
-            },{id: "post-mhc-manifold-constrained-hyper-connections",
+            },{id: "post-mamba-linear-time-sequence-modeling-with-selective-state-spaces",
+        
+          title: "Mamba: Linear-Time Sequence Modeling with Selective State Spaces",
+        
+        description: "Notes on Mamba paper by Albert Gu and Tri Dao - exploring selective state space models as an alternative to transformers with fixed-size internal states and efficient inference.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/mamba-linear-time-sequence-modeling/";
+          
+        },
+      },{id: "post-mhc-manifold-constrained-hyper-connections",
         
           title: "mHC: Manifold-Constrained Hyper-Connections",
         
