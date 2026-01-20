@@ -13,7 +13,7 @@ toc:
 
 By Albert Gu and Tri Dao.
 
-LLMs are dominated by transformers. In this blog post we review a different one called Mamba. Mamba has deep ties to the control community, and leveraging wisdom from system control could has potential to improve research on SSM-based large models.
+LLMs are dominated by transformers nowadays. In this blog post we review a different one called Mamba. Mamba has deep ties to the control community, and leveraging wisdom from system control could have potential to improve research on SSM-based large models.
 
 Motivation of Mamba is trying to merge the gap between transformer and a group of more traditional RNN-type models. Essentially, transformer is a type of RNN-type model with expanding hidden state (KV caches), while the traditional RNN-models maintain a fix-size internal state for the whole sequence.
 
