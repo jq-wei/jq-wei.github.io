@@ -11,8 +11,6 @@ toc:
   sidebar: left
 ---
 
-# Mamba: Linear-Time Sequence Modeling with Selective State Spaces
-
 By Albert Gu and Tri Dao.
 
 LLMs are dominated by transformers. In this blog post we review a different one called Mamba. Mamba has deep ties to the control community, and leveraging wisdom from system control could has potential to improve research on SSM-based large models.
