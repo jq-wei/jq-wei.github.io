@@ -61,11 +61,11 @@ This type is for dense thought, for sparse thought, the model dose not need to t
 
 First, this paper discussed fine-tune a LLM to boost the ReAct performance. The author used a base model PaLM-8/62B as a candidate. Without finetuning, ReAct perform the worst. But with only 3000-example fine-tuning, the ReAct outperform all the others.
 
-<img src="/assets/img/llm-agents/Screenshot_2025-12-30_at_10.48.54.png" width="70%" alt="ReAct Finetuning Results">
+<img src="/assets/img/llm-agents/Screenshot_2025-12-30_at_10.48.54.png" width="80%" alt="ReAct Finetuning Results">
 
 The authors also compared the ReAct Performance of PaLM-540B and GPT3. GPT3 is better means the model there can follow the ReAct prompt better than PaLM-540B. This is probably because the instruct fine tuning done towards GPT3 with some human thinking and action steps in the samples.
 
-<img src="/assets/img/llm-agents/Screenshot_2025-12-30_at_13.02.41.png" width="70%" alt="Model Comparison">
+<img src="/assets/img/llm-agents/Screenshot_2025-12-30_at_13.02.41.png" width="80%" alt="Model Comparison">
 
 ## In-context-learning and zero-shot ReAct agent
 
@@ -234,7 +234,7 @@ where $z_i$ is the each thought and y is the final output. In other words, in Co
 
 ### General framework
 
-<img src="/assets/img/llm-agents/Screenshot_2026-03-08_at_07.31.43.png" width="70%" alt="Tree of Thoughts Framework">
+<img src="/assets/img/llm-agents/Screenshot_2026-03-08_at_07.31.43.png" width="80%" alt="Tree of Thoughts Framework">
 
 Sequence generations like CoT suffer from these two key shortcomings:
 
@@ -270,7 +270,7 @@ Now with the multiple thoughts generated, state evaluator evaluates the progress
 
 **4 Search algorithm**
 
-<img src="/assets/img/llm-agents/Screenshot_2026-03-09_at_07.08.00.png" width="70%" alt="Search Algorithms">
+<img src="/assets/img/llm-agents/Screenshot_2026-03-09_at_07.08.00.png" width="80%" alt="Search Algorithms">
 
 Given the increasing size of the tree, the authors proposed two algorithms to search for the most promising path while keeping the tree manageable.
 
@@ -284,13 +284,13 @@ In the paper, the author consider three experiments, Game24, creative writing, a
 
 Game of 24 is a mathematical reasoning challenge, where the goal is to use 4 numbers and basic arithmetic operations (+-*/) to obtain 24.
 
-<img src="/assets/img/llm-agents/Screenshot_2026-03-09_at_07.17.04.png" width="70%" alt="Game of 24 Example">
+<img src="/assets/img/llm-agents/Screenshot_2026-03-09_at_07.17.04.png" width="80%" alt="Game of 24 Example">
 
 For the thought decomposition, this game has at most 3 steps (4 initial numbers, one fewer after each arithmetic operation). Thought generator in this case is at each step, one LLM call to propose some possible moves. Then one separate LLM call to evaluate each thought candidate as 'sure/maybe/impossible' wrt reaching 24. Then BFS is employed to keep the best b=5 candidates at each step.
 
 ### Result
 
-<img src="/assets/img/llm-agents/Screenshot_2026-03-09_at_09.59.08.png" width="70%" alt="ToT Results">
+<img src="/assets/img/llm-agents/Screenshot_2026-03-09_at_09.59.08.png" width="80%" alt="ToT Results">
 
 For the Game24, the result of ToT is outperforming CoT, even with b=1. From the error analysis (fig 3(b)), CoT failed mostly at the first step of the reasoning, then it has no capability to 'correct itself'. However, ToT fails more 'equally' at each step. This is mainly due its ability to explore and self-correct. The final column in fig.3(b) showcased that ToT has much higher success rate compare to CoT (consistent to the result in Table 2).
 
@@ -312,11 +312,11 @@ The following example (HotpotQA) illustrate the workflow. The first trial failed
 
 The experiment in this paper shows the power of Reflexion by outperforming agents like ReAct in ALFWorld.
 
-<img src="/assets/img/llm-agents/Screenshot_2026-03-03_at_11.03.23.png" width="70%" alt="Reflexion Performance">
+<img src="/assets/img/llm-agents/Screenshot_2026-03-03_at_11.03.23.png" width="80%" alt="Reflexion Performance">
 
 ## Architecture
 
-<img src="/assets/img/llm-agents/Screenshot_2026-03-03_at_11.07.18.png" width="70%" alt="Reflexion Architecture">
+<img src="/assets/img/llm-agents/Screenshot_2026-03-03_at_11.07.18.png" width="80%" alt="Reflexion Architecture">
 
 Reflexion is taking ReAct paradigm and has 4 main components (besides the Env): Actor, Evaluator, Self-reflection, and Memory. All the first three are LLMs, which can be different models, or same model different calls. Memory in this work is text.
 
