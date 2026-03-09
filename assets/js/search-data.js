@@ -37,7 +37,18 @@ ninja.data = [{
               handler: () => {
                 window.location.href = "/blog/";
               },
-            },{id: "post-mamba-linear-time-sequence-modeling-with-selective-state-spaces",
+            },{id: "post-action-planning-and-memory-the-foundation-of-llm-agents",
+        
+          title: "Action, Planning, and Memory: The Foundation of LLM Agents",
+        
+        description: "Exploring three foundational frameworks for LLM agents - ReAct (action and reasoning), Tree of Thoughts (planning and search), and Reflexion (memory and learning) - that transform passive language models into capable autonomous agents.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/action-planning-memory-foundation-llm-agents/";
+          
+        },
+      },{id: "post-mamba-linear-time-sequence-modeling-with-selective-state-spaces",
         
           title: "Mamba: Linear-Time Sequence Modeling with Selective State Spaces",
         
