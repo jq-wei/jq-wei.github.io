@@ -13,7 +13,7 @@ toc:
 
 Large language models (LLMs) have demonstrated remarkable capabilities across a wide range of tasks, yet their underlying mechanism remains surprisingly simple: they generate text token-by-token in a sequence. However, at least for the basic transformer inference, this generation is passive. To transform these models from passive text generators into capable autonomous agents, we must look beyond standard prompting paradigms. This post explores one foundational framework (main contribution by Shunyu Yao) that provide the missing architectural pillars for true agency:
 
-**ReAct** (equipping models with external actions and observations), **Tree of Thoughts** (upgrading internal reasoning to deliberate, "System 2" planning and search), and **Reflexion** (providing dynamic memory to learn from past successes and failures). Together, action, planning, and memory form the fundamental blueprint for the next generation of AI agents.
+**ReAct** (equipping models with external actions and observations), **Tree of Thoughts** (upgrading internal reasoning to deliberate, planning and search), and **Reflexion** (providing dynamic memory to learn from past successes and failures). Together, action, planning, and memory form the fundamental blueprint for the next generation of AI agents.
 
 # ReAct
 
