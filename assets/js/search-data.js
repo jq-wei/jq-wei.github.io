@@ -37,7 +37,18 @@ ninja.data = [{
               handler: () => {
                 window.location.href = "/blog/";
               },
-            },{id: "post-action-planning-and-memory-the-foundation-of-llm-agents",
+            },{id: "post-kimi-attention-residual-rethinking-layer-connections-in-transformers",
+        
+          title: "Kimi Attention Residual: Rethinking Layer Connections in Transformers",
+        
+        description: "A breakthrough in residual architecture that applies attention mechanisms across layers, not just tokens",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/kimi-attention-residual/";
+          
+        },
+      },{id: "post-action-planning-and-memory-the-foundation-of-llm-agents",
         
           title: "Action, Planning, and Memory: The Foundation of LLM Agents",
         
