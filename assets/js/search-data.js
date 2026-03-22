@@ -37,7 +37,18 @@ ninja.data = [{
               handler: () => {
                 window.location.href = "/blog/";
               },
-            },{id: "post-action-planning-and-memory-the-foundation-of-llm-agents",
+            },{id: "post-kimi-attention-residual-understanding-transformer-inference",
+        
+          title: "Kimi Attention Residual: Understanding Transformer Inference",
+        
+        description: "A deep dive into transformer inference mechanics, exploring prefill vs decode stages, attention calculations, and KV caching in Qwen3",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/kimi-attention-residual-transformer-inference/";
+          
+        },
+      },{id: "post-action-planning-and-memory-the-foundation-of-llm-agents",
         
           title: "Action, Planning, and Memory: The Foundation of LLM Agents",
         
