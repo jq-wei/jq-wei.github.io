@@ -41,15 +41,11 @@ $$
 
 which is a backward residual with $$\frac{\partial \mathcal{L}}{\partial \mathbf{h}_L}$$ (gradient of loss w.r.t. the last hidden-state) fed to all the previous layers. Here $$\mathbf{I}$$ is the identity matrix.
 
-### Matrix Representation
-
 Note that by denoting $$v_0 = h_1$$ (the embedding), and $$v_{l-1} = h_l$$, we can also write the classic residual in this compact form:
 
 $$
 \begin{bmatrix}\mathbf{h}_1 \\\mathbf{h}_2 \\\vdots \\\mathbf{h}_L\end{bmatrix}=\begin{bmatrix}1 &        &        &        \\1 & 1      &        &        \\\vdots & \vdots & \ddots &        \\1 & 1      & \cdots & 1\end{bmatrix}\begin{bmatrix}v_0 \\v_1 \\\vdots \\v_{L-1}\end{bmatrix}
 $$
-
-### Comparison with mHC
 
 mHC (Hyper-Connections) expanded the residual into a higher dimension with the following updated triangle matrix (top 4×4, see [ref 1](https://arxiv.org/pdf/2512.24880) and [ref 2](https://jq-wei.github.io/blog/2026/mhc-manifold-constrained-hyper-connections/) for details):
 
@@ -61,13 +57,9 @@ $$
 
 Looking at the classic residual, the input of the $$l$$-th layer is summation of the outputs of the previous layers ($$h_1$$ is the output of the embedding layer), then a natural extension/question is convex combination of the outputs. To derive the weights, the author proposed a way using attention.
 
-### The Key Insight
-
 For the original attention, at the each position of the sequence, the attention weight is derived by taking the current query vector, dot product with all the previous key vectors. This way each layer at the current position will decide which tokens are more important.
 
 Now the idea is the same from the perspective of model layers: at the current layer, it need to decides which previous layer's output is more important.
-
-### Implementation
 
 So the author introduce a learnable vector $$w_l$$ for $$l$$-th layer as the query vector, and denote
 
@@ -89,8 +81,6 @@ $$
 
 with $$\phi(q, k) = \exp\bigl(q^\top \operatorname{RMSNorm}(k)\bigr)$$. In other words, each layer uses an attention-based method to combine all the output of the previous layers.
 
-### Matrix Form
-
 To be consistent with classic residual, the lower-triangular all-ones matrix becomes:
 
 $$
@@ -102,8 +92,6 @@ for full attention residual (top 4×4, and without normalization).
 ## Blocked Attention Residual
 
 Due to the overhead of the full attention residual, the author proposed Block Attention residual to reduce both memory and communication overhead.
-
-### Algorithm
 
 The algorithm works as the following.
 
@@ -122,23 +110,19 @@ $$
    - For subsequent layers ($$i\geq 2$$) in block $$n$$: $$V = [b_0, b_1, \ldots, b_{n-1}, b_n^{i-1}]^\top$$
 7. The attention weight and the final convex combination are the same as the full AttnRes case
 
-### Matrix Form
-
 In this case, the lower-triangular matrix becomes (top 4×4, 3 layers per block, without normalization):
 
 $$
 \begin{pmatrix}\phi(\boldsymbol{w}_1, \boldsymbol{y}_0) & & & \\\phi(\boldsymbol{w}_2, \boldsymbol{y}_0) & \phi(\boldsymbol{w}_2, \boldsymbol{y}_1) & & \\\phi(\boldsymbol{w}_3, \boldsymbol{y}_0) & \phi(\boldsymbol{w}_3, \boldsymbol{y}_{1:2}) & \phi(\boldsymbol{w}_3, \boldsymbol{y}_{1:2}) & \\\phi(\boldsymbol{w}_4, \boldsymbol{y}_0) & \phi(\boldsymbol{w}_4, \boldsymbol{y}_{1:3}) & \phi(\boldsymbol{w}_4, \boldsymbol{y}_{1:3}) & \phi(\boldsymbol{w}_4, \boldsymbol{y}_{1:3})\end{pmatrix}
 $$
 
-### Architecture Comparison
-
-The three architectures can be depicted as follows:
+The previous three architecture can be depicted as the following figure.
 
 <img src="{{ '/assets/img/kimi-attention/Screenshot_2026-03-21_at_22.22.05.png' | relative_url }}" alt="Comparison of Classic Residual, Full AttnRes, and Block AttnRes architectures" width="80%">
 
 ## Main Results
 
-### Infrastructure Design
+### Infra design
 
 Block AttnRes needs to propagate the output across pipeline stages, causing heavy communication in a naive setting. Here we use a simple example to illustrate the idea.
 
@@ -153,7 +137,7 @@ First Pass (Virtual Stage 0): GPU 0 processes Layers 1 & 2, and creates the firs
 
 Second Pass (Virtual Stage 1): The pipeline loops back to GPU 0 to process Layers 5 & 6. GPU 0 receives a new block representation ($$b_1$$) and caches it. Now, GPU 0 needs to pass the data to GPU 1 for the final layers (7 & 8). Because of the caching optimization, GPU 0 only transmits the incremental new block ($$b_1$$) to GPU 1. It does not need to re-transmit $$b_0$$, because GPU 1 already saved it during Virtual Stage 0.
 
-### Scaling Law
+### Scaling law
 
 <img src="{{ '/assets/img/kimi-attention/Screenshot_2026-03-21_at_22.24.47.png' | relative_url }}" alt="Scaling law comparison showing AttnRes achieving lower loss" width="80%">
 
@@ -161,7 +145,7 @@ The authors trained a series of MoE models across five different sizes (active p
 
 "All three variants exhibit a similar slope, but AttnRes consistently achieves lower loss across the entire compute range."
 
-### Training Dynamics
+### Training dynamics
 
 <img src="{{ '/assets/img/kimi-attention/Screenshot_2026-03-22_at_07.31.18.png' | relative_url }}" alt="Training dynamics comparison showing output and gradient magnitude" width="80%">
 
