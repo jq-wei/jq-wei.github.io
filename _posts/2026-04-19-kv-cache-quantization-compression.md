@@ -160,7 +160,7 @@ Notations: denote unit hypersphere in $\mathbb{R}^d$  as $\mathbb{S}^{d-1}$.
 
 In this section, we focus on the question about how to quantize unit, random vectors. 
 
-#### Foundation 1: unit random vector
+#### Foundation: unit random vector
 
 The most important foundation of TurboQuant is the distribution of each coordination of the high-dimensional unit random vectors can be formulated analytically. 
 
@@ -222,7 +222,7 @@ Now given this quantization for the scalar, the quantization of $\mathbf{\Pi} x$
 
 Now an important question is: what is the upper bound $D_{\mathrm{mse}}$ of the Algorithm 1. Theorem 1 in [5] proved that $D_{\mathrm{mse}}$ is bounded by $D_{\mathrm{mse}} \leq \frac{\sqrt{3\pi}}{2} \cdot \frac{1}{4^{b}}$. Note that this upper bound is independent wrt the vector dimension $d$. **But there is hidden assumption of this paper which is $d$ should be large enough** (coordinates become nearly independent for high dimensions). This is satisfied with modern KV cache vectors. 
 
-**Why** $D_{\mathrm{mse}} = \mathbb{E}\Bigl[ \bigl\| \boldsymbol{y} - \tilde{\boldsymbol{y}} \bigr\|_{2}^{2} \Bigr]$**?**
+##### Why $D_{\mathrm{mse}} = \mathbb{E}\Bigl[ \bigl\| \boldsymbol{y} - \tilde{\boldsymbol{y}} \bigr\|_{2}^{2} \Bigr]$ ?
 
 In the proof of Theorem, the first equality is actually very crucial. Due to the property of rotation matrix, we have $\|\boldsymbol{x} - \tilde{\boldsymbol{x}}\|_2 = \|\boldsymbol{\Pi} \cdot \boldsymbol{x} - \tilde{\boldsymbol{y}}\|_2 = \|\boldsymbol{y} - \tilde{\boldsymbol{y}}\|_2$ , hence  
 
