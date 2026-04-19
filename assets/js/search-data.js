@@ -37,7 +37,18 @@ ninja.data = [{
               handler: () => {
                 window.location.href = "/blog/";
               },
-            },{id: "post-kimi-attention-residual-rethinking-layer-connections-in-transformers",
+            },{id: "post-kv-cache-management-quantization-and-compression",
+        
+          title: "KV Cache Management: Quantization and Compression",
+        
+        description: "A walk-through of representative KV cache compression (Scissorhands, Top-K attention, SnapKV, PyramidKV) and quantization (TurboQuant, RaBitQ) methods for long-context LLM inference.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/kv-cache-quantization-compression/";
+          
+        },
+      },{id: "post-kimi-attention-residual-rethinking-layer-connections-in-transformers",
         
           title: "Kimi Attention Residual: Rethinking Layer Connections in Transformers",
         
