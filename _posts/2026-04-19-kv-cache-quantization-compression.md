@@ -234,7 +234,7 @@ D_{\text{mse}} &= \mathbb{E}_Q[\|\boldsymbol{\Pi} \cdot \boldsymbol{x} - \tilde{
 \end{aligned}
 $$
 
-Then since this is for the worst-case vector $\boldsymbol{x}$, the expectation wrt $\boldsymbol{\Pi}$ is the same as the expectation to** $\boldsymbol{y}$. 
+Then since this is for the worst-case vector $\boldsymbol{x}$, the expectation wrt $\boldsymbol{\Pi}$ is the same as the expectation to $\boldsymbol{y}$. 
 
 #### (Near) Inner-product Optimal TurboQuant
 
