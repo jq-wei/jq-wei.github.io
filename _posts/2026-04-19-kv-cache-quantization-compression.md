@@ -70,7 +70,7 @@ I &= \operatorname{Top}_{k}(\mathbf{C}, k)
 \end{aligned}
 $$
 
-where $\mathbf{W}_{\mathrm{obs}}\in \mathbb{R}^{N, L_{\mathrm{obs}}, L_{\mathrm{prefix}}}$, $N$ is the number of heads. Hence $\mathbf{C}\in\mathbb{R}^{N, L_{\mathrm{prefix}}}$. Top_k selects the indices I of the top k values in C per head.  In other words, here we do one reduce for each token’s attention within observation windows, then select top-k for each head. 
+where <span markdown="0">$\mathbf{W}_{\mathrm{obs}}\in \mathbb{R}^{N, L_{\mathrm{obs}}, L_{\mathrm{prefix}}}$</span>, $N$ is the number of heads. Hence $\mathbf{C}\in\mathbb{R}^{N, L_{\mathrm{prefix}}}$. $\operatorname{Top}_k$ selects the indices $I$ of the top $k$ values in $\mathbf{C}$ per head.  In other words, here we do one reduce for each token’s attention within observation windows, then select top-$k$ for each head. 
 
 In order to verify the observation windows did reflects the attention distribution during the generation/decoding, the authors introduce hit rate as following.
 
@@ -86,7 +86,7 @@ H                           &= \frac{\sum \mathbf{O}}{\sum M_{\text{threshold\_c
 \end{aligned}
 $$
 
-Step 1 here is to generate a all zero matrix from $\mathbb{R}^{N\times L_{\mathrm{prefix}}}$, which is the same size as $\mathbf{A}_{\text{cur}}$. Here  $\mathbf{A}_{\text{cur}}$ represents attention feature between the current generated Q and the prefix K. 
+Step 1 here is to generate a all zero matrix from $\mathbb{R}^{N\times L_{\mathrm{prefix}}}$, which is the same size as <span markdown="0">$\mathbf{A}_{\text{cur}}$</span>. Here <span markdown="0">$\mathbf{A}_{\text{cur}}$</span> represents attention feature between the current generated Q and the prefix K.
 
 Step 2 and 3 is to make the corresponding position to be 1. 
 
@@ -198,7 +198,7 @@ $$
 
 Note that the authors stated in Section 1.1 that ‘aim to design quantizer which minimize the measures’, the result here is not in strict optimal manner (not e.g., $\arg\min$), except for 1-D case, rather proved that for TurboQuant, the upper bound is pretty close to the theoretical lower bound. 
 
-In the following two subsection, we will look closer at 2 proposed family quantizers $\mathrm{TurboQuant}_\mathrm{mse}$ and $\mathrm{TurboQuant}_\mathrm{prod}$.
+In the following two subsection, we will look closer at 2 proposed family quantizers <span markdown="0">$\mathrm{TurboQuant}_\mathrm{mse}$</span> and <span markdown="0">$\mathrm{TurboQuant}_\mathrm{prod}$</span>.
 
 #### Near MSE optimal TurboQuant
 
