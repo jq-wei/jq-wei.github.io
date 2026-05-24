@@ -37,7 +37,18 @@ ninja.data = [{
               handler: () => {
                 window.location.href = "/blog/";
               },
-            },{id: "post-kv-cache-management-quantization-and-compression",
+            },{id: "post-heuristic-learning-for-control-building-a-harness-beyond-gradients",
+        
+          title: "Heuristic Learning for Control: Building a Harness Beyond Gradients",
+        
+        description: "Notes from building a small heuristic-learning control harness where an LLM reads experiment logs, edits non-neural controllers, tunes parameters, and refines failure modes without gradient training.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/heuristic-learning-control-harness/";
+          
+        },
+      },{id: "post-kv-cache-management-quantization-and-compression",
         
           title: "KV Cache Management: Quantization and Compression",
         
