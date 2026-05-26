@@ -610,7 +610,7 @@ For control problems where the answer should be a simple, inspectable controller
 
 For completeness, here are the three final controller bodies from the accepted runs. I keep them here because the details are part of the point: the final artifacts are small, inspectable programs rather than opaque policy checkpoints.
 
-<details>
+<details markdown="1">
 <summary>Cart-link final controller: swing-up plus Riccati/LQR stabilizer</summary>
 
 ```python
@@ -730,7 +730,7 @@ def candidate_0006_controller(obs: dict) -> np.ndarray:
 
 </details>
 
-<details>
+<details markdown="1">
 <summary>Crowd evacuation final controller: local goal seeking, repulsion, corridor centering, stuck recovery</summary>
 
 ```python
@@ -826,7 +826,7 @@ def candidate_0010_controller(obs: dict) -> np.ndarray:
 
 </details>
 
-<details>
+<details markdown="1">
 <summary>LunarLander final controller: descent schedule, attitude control, landing latch</summary>
 
 ```python
