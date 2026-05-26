@@ -13,9 +13,7 @@ toc:
 
 This post is a short lab note from building a small **heuristic-learning control harness**. The core idea is close in spirit to n+e's post [Learning Beyond Gradients](https://trinkle23897.github.io/learning-beyond-gradients/): instead of updating neural-network weights by backpropagation, we let a language model inspect experiments, read rewards and logs, and directly rewrite a candidate solution. While the original experiments in that post were mostly RL-style tasks, control problems seem like a particularly natural fit: the goal is often not just high reward, but an interpretable analytic controller.
 
-This harness sits in a family of recent work where the LLM acts as a code-mutating search operator. The closest cousins are FunSearch, which searches programs for mathematical problems through LLM mutation and a program database; AlphaEvolve, a larger evolutionary coding-agent version of the same basic instinct; and Voyager, where an LLM writes reusable code skills in open-ended Minecraft. These methods lean on population diversity and many samples. By contrast, Eureka keeps gradient-based RL but uses an LLM to write the reward function, sitting one level above where this harness operates. The whiteboard mechanism here feels closer in spirit to GEPA's reflective prompt evolution: natural-language reflection becomes an update signal that compresses experience instead of summing gradients. Compared to a classical optimizer like CMA-ES for parameter search, the LLM contributes structured proposals -- controller families, switching logic, geometric reframings -- that a Gaussian mutation cannot produce.
-
-References: [FunSearch](https://www.nature.com/articles/s41586-023-06924-6), [AlphaEvolve](https://deepmind.google/discover/blog/alphaevolve-a-gemini-powered-coding-agent-for-designing-advanced-algorithms/), [Voyager](https://arxiv.org/abs/2305.16291), [Eureka](https://arxiv.org/abs/2310.12931), [GEPA](https://arxiv.org/abs/2507.19457), [CMA-ES](https://www.cmap.polytechnique.fr/~nikolaus.hansen/cmaesintro.html).
+This harness sits in a family of recent work where the LLM acts as a code-mutating search operator. The closest works are FunSearch, which searches programs for mathematical problems through LLM mutation and a program database; AlphaEvolve, a larger evolutionary coding-agent version of the same basic instinct; and Voyager, where an LLM writes reusable code skills in open-ended Minecraft. These methods lean on population diversity and many samples. By contrast, Eureka from Nvidia keeps gradient-based RL but uses an LLM to write the reward function, sitting one level above where this harness operates. The **whiteboard mechanism** here feels closer in spirit to GEPA's reflective prompt evolution: natural-language reflection becomes an update signal that compresses experience instead of summing gradients. Compared to a classical optimizer like CMA-ES for parameter search, the LLM contributes structured proposals -- controller families, switching logic, geometric reframings -- that a Gaussian mutation cannot produce.
 
 Here the candidate solution is not a neural-network based policy. It is controller code in python: PID-like rules, energy shaping, LQR-style switching logic, barriers, geometries, and a small dictionary of tunable parameters. The harness runs the controller in an environment, records metrics and trajectories, gives the agent a curated context, asks for a new controller proposal, applies it in a sandbox, reruns evaluation, and repeats.
 
@@ -39,13 +37,13 @@ The first version of my harness was intentionally simple:
 3. ask an analyst agent to diagnose failure,
 4. ask an editor agent to propose a new controller function,
 5. validate the proposal schema and registry patch,
-6. apply it in an isolated candidate workspace,
+6. apply it in an isolated candidate workspace (sandboxes),
 7. run tests and evaluations,
 8. tune exposed parameters,
 9. compare against the baseline,
-10. summarize failure modes into a "whiteboard" for the next attempt.
+10. summarize failure modes into a "whiteboard" (overview of the experiment so far) for the next attempt.
 
-The important part turned out not to be the orchestration itself. It was **what context to give the model between iterations**.
+The important part turned out not to be the orchestration itself. It was **LLM agents harness: what context to give the model between iterations**. For the backend LLM, we use Deepseek V4 Pro. 
 
 ## The harness loop
 
@@ -91,14 +89,12 @@ The harness checks the schema, applies the code in a copied candidate workspace,
 
 The biggest practical lesson was that raw logs are not enough.
 
-Early on I gave the remote model file paths like:
-
+We start the harness which takes the important artifacts like
 ```markdown
 - /Users/.../baseline/aggregate/summary.md
 - /Users/.../baseline/aggregate/metrics.json
 ```
-
-This looked reasonable in a local IDE, but it was wrong for a remote API model. DeepSeek sees text, not my filesystem. If the prompt only contains file paths, the model cannot inspect the files. So the harness now embeds the important artifacts directly into the prompt:
+directly into the prompt:
 
 - environment source snippets,
 - controller source snippets,
@@ -110,7 +106,7 @@ This looked reasonable in a local IDE, but it was wrong for a remote API model. 
 - dominant failure mode,
 - concrete next-attempt guidance.
 
-I started thinking of this as a research **whiteboard**. It is not a transcript. It is not every log line. It is a compact, curated working memory.
+I started thinking of this as a research **whiteboard**. It is not a transcript, nor every log lines. It is a compact, curated working memory.
 
 A typical environment profile looks like this:
 
@@ -208,7 +204,7 @@ For example, after a candidate achieved swing-up but failed terminal hold, the r
 }
 ```
 
-This is the whiteboard doing its job: preserve the useful discovery, discard stale noise.
+This is the whiteboard doing its job: keep the overview context about the experiments so far, preserve the useful discovery, discard stale noise.
 
 ## Pitfall 3: tuning is part of the agent
 
@@ -260,7 +256,22 @@ Baseline metrics over three seeds:
 }
 ```
 
-The agent first discovered energy-shaping swing-up controllers. These could often reach the upright region but did not always stay there. That was useful, but not yet the right controller.
+Under the initial achievement-style objective, the useful parent that emerged was `candidate_0025`. It used an energy-shaping swing-up strategy and reached the upright success region on all five holdout seeds, without leaving the track:
+
+```json
+{
+  "controller": "candidate_0025",
+  "success_rate": 1.0,
+  "first_success_step_mean": 327.2,
+  "final_upright_error_mean": 0.1833,
+  "final_abs_theta_dot_mean": 0.8065,
+  "max_track_violation_max": 0.0
+}
+```
+
+<img src="{{ '/assets/img/heuristic-learning-control/cart_link_candidate_0025_achievement_parent.gif' | relative_url }}" alt="Cart-link candidate 0025 as the achievement-success parent before terminal refinement." width="80%">
+
+This was useful, but not yet the right controller: it could swing up and enter the success region, while still carrying enough angular velocity that terminal stabilization was not guaranteed. That is why the next run resumed from `candidate_0025` instead of starting over.
 
 ### Cart-link: terminal refinement
 
@@ -591,3 +602,11 @@ This experiment made the "learning beyond gradients" idea feel concrete to me. T
 That is slower and messier than gradient descent, but it has a different kind of leverage: the candidate can jump from energy shaping to LQR, from a loose success definition to terminal hold, from a brittle gain schedule to a structured controller family.
 
 For control problems where the answer should be a simple, inspectable controller rather than a neural policy, this is a surprisingly promising search loop.
+
+## References: 
+1. [FunSearch](https://www.nature.com/articles/s41586-023-06924-6) 
+2. [AlphaEvolve](https://deepmind.google/discover/blog/alphaevolve-a-gemini-powered-coding-agent-for-designing-advanced-algorithms/)
+3. [Voyager](https://arxiv.org/abs/2305.16291)
+4. [Eureka](https://arxiv.org/abs/2310.12931)
+5. [GEPA](https://arxiv.org/abs/2507.19457)
+6. [CMA-ES](https://www.cmap.polytechnique.fr/~nikolaus.hansen/cmaesintro.html).
