@@ -453,12 +453,107 @@ The resumed run accepted `candidate_0010`:
 
 This felt like the most important harness lesson so far. The model did not just need reward. It needed an experimental notebook: which attempt almost worked, what to preserve, what precise gap remained, and what not to regress on.
 
+### LunarLander: an RL-style benchmark
+
+The third experiment was `LunarLanderContinuous`. This was useful because it put the harness much closer to a standard RL benchmark. There is a known neural-policy baseline from Stable-Baselines3, and the task is familiar enough that a handcrafted controller is plausible but not trivial.
+
+This also forced a question that did not matter as much in the first two experiments: **what environment information is fair to give the model?**
+
+In n+e's [Learning Beyond Gradients](https://trinkle23897.github.io/learning-beyond-gradients/) setup, this boundary depends on the task. Their Atari prompt, as released in the [repo](https://github.com/Trinkle23897/learning-beyond-gradients), is much closer to black-box interaction: use public observations, actions, rewards, renderings, and API-visible fields, but do not read simulator internals. The MuJoCo Ant part is different. The blog describes first reading public environment semantics such as observation layout, reward, action order, root velocity, torso orientation, joint positions, and joint velocities. Later, the stronger Ant result uses residual MPC with a local MuJoCo model. MPC means model predictive control: at each step, roll out short candidate action sequences in a local dynamics model, execute the first action from the best short-horizon plan, and replan at the next step. That is no longer pure black-box reward chasing. It is model-based, or at least gray-box.
+
+For LunarLander I chose a gray-box version of the benchmark. The harness writes a compact environment source digest from the installed Gymnasium implementation and includes it in the prompt. It does not dump the entire simulator, but it tells the model the important semantics:
+
+```markdown
+Observation:
+- x, y
+- x_dot, y_dot
+- angle, angular_velocity
+- left_leg_contact, right_leg_contact
+
+Action:
+- action[0] controls the main engine
+- action[1] controls the side engines
+- action[0] <= 0 means main engine off
+- action[0] > 0 gives at least half-power main thrust
+- abs(action[1]) <= 0.5 means side engines off
+
+Reward and termination:
+- reward is a change in shaping minus fuel costs
+- main-engine use and side-engine use are penalized
+- body contact or flying out of bounds terminates badly
+- sleeping after a stable landing terminates positively
+```
+
+This matters. Without the action-threshold details, a controller can emit tiny positive main-engine commands and accidentally fire at half power. Without the observation semantics, the model has to rediscover the task from reward traces alone. RL can treat the environment as a black box because gradient-based training can do millions of interactions. This harness is trying to synthesize code with tens of experiments, so it benefits from the same kind of task specification a human controls engineer would ask for.
+
+The zero controller falls immediately:
+
+<img src="{{ '/assets/img/heuristic-learning-control/lunar_lander_zero_baseline.gif' | relative_url }}" alt="LunarLander zero controller baseline." width="80%">
+
+The first good heuristic parent was `candidate_0015`. It solved the reward-threshold style objective on all five reference seeds, but only achieved terminal quiet landing on four of five:
+
+<img src="{{ '/assets/img/heuristic-learning-control/lunar_lander_candidate_0015_achievement.gif' | relative_url }}" alt="LunarLander candidate 0015 reaching reward success but not terminal success on every seed." width="80%">
+
+That is the same lesson as cart-link, but in an RL environment: reward success and the state I actually wanted were not identical. The next run resumed from `candidate_0015` with a terminal-refinement whiteboard:
+
+```markdown
+Active success mode: `terminal`
+
+Preserve:
+- stable descent and reward-solving behavior from `candidate_0015`
+- crash_rate = 0.0
+- achievement_success_rate = 1.0
+
+Fix:
+- convert solved-but-not-terminal cases into true quiet landings
+- reduce final lateral error and final angle
+- avoid hovering forever or burning unnecessary fuel
+```
+
+The accepted result was `candidate_0009`, a compact rule controller rather than a neural network. It uses a vertical descent target, lateral correction, attitude stabilization, contact-aware shutdown, and a tunable set of thresholds and gains.
+
+<img src="{{ '/assets/img/heuristic-learning-control/lunar_lander_candidate_0009_terminal.gif' | relative_url }}" alt="LunarLander terminal-refined heuristic candidate 0009." width="80%">
+
+On new holdout seeds, `candidate_0009` passed both success modes:
+
+```json
+{
+  "achievement_success_rate": 1.0,
+  "terminal_success_rate": 1.0,
+  "landing_rate": 1.0,
+  "crash_rate": 0.0,
+  "timeout_rate": 0.0,
+  "total_reward_mean": 234.88,
+  "episode_steps_mean": 362.6,
+  "final_landing_error_mean": 0.058
+}
+```
+
+I then compared it against the Stable-Baselines3 PPO policy `sb3/ppo-LunarLanderContinuous-v2` on the same five seeds. The PPO policy lands faster and scores higher:
+
+<img src="{{ '/assets/img/heuristic-learning-control/lunar_lander_sb3_ppo_reference.gif' | relative_url }}" alt="Stable-Baselines3 PPO LunarLander reference policy." width="80%">
+
+| policy | terminal success | mean reward | mean steps | landing error | main engine | side engine |
+|---|---:|---:|---:|---:|---:|---:|
+| heuristic `candidate_0015` | 0.80 | 225.19 | 408.2 | 0.119 | 0.467 | 0.108 |
+| heuristic `candidate_0009` | 1.00 | 236.36 | 381.8 | 0.068 | 0.210 | 0.287 |
+| SB3 PPO reference | 1.00 | 257.35 | 278.6 | 0.033 | 0.123 | 0.352 |
+
+This comparison is exactly the nuance I wanted. The heuristic controller closed the main specification gap: it landed terminally on all five seeds. PPO was still better at the native RL objective: higher reward, fewer steps, and more precise final placement.
+
+The reason is partly objective design. The Gym reward is dense and includes shaping, terminal bonuses/penalties, and fuel costs. PPO optimizes that reward directly, so shorter, cleaner, lower-fuel landings are naturally preferred. My harness acceptance, on the other hand, first asked: did it land safely and quietly? Reward was still recorded and used as a secondary signal, but it was not the only gate. If I wanted the heuristic controller to chase PPO's score more aggressively, I would add another refinement phase that explicitly optimizes fuel and step count after terminal success is solved.
+
+This is also where the control-vs-RL distinction becomes concrete. PPO gives a strong policy, but it is a trained neural network artifact plus its inference stack. The heuristic candidate is a small piece of controller code with a few scalar operations and a parameter dictionary. I have not yet done a careful embedded inference benchmark, so I will not claim a measured speedup. But as an object, the heuristic controller is cheaper to inspect, easier to port, and easier to reason about than a neural policy. The tradeoff is that it depends more on task semantics and on the harness giving the model the right experimental whiteboard.
+
+So I do not read this as "heuristic control replaces RL." I read it as: for some dynamic or geometric control tasks, there may be a much smaller controller hiding behind a neural-policy benchmark, and an LLM-guided harness can sometimes find it.
+
 ## What worked
 
 The pieces that mattered most were:
 
 - **structured proposals** instead of free-form patches,
 - **inline artifacts** instead of local file paths,
+- **environment source digests** for third-party benchmark semantics,
 - **separate achievement and terminal success metrics**,
 - **candidate workspaces** so bad proposals do not contaminate the repo,
 - **reflection summaries** that compress history into a whiteboard,
@@ -480,6 +575,10 @@ The next step is to make the harness more sandboxed and more benchmark-friendly:
 6. make the whiteboard explicitly versioned.
 
 There is also a deeper research question: how much context should the model see? Too little and it misses the key failure. Too much and it follows stale advice into a local optimum. My current answer is to give it a living whiteboard, not an archive.
+
+## Backend note
+
+All of these runs used `deepseek-v4-pro` as the backend LLM. One practical surprise was cost: the dashboard for this month showed 796 API requests and about 15.4M tokens, with total spend around 45 CNY. That makes this style of experiment feel much more plausible as an iterative research loop. The expensive part is still human and experimental time, not just the model calls.
 
 ## Takeaway
 
