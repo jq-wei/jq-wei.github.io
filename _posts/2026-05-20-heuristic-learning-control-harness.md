@@ -610,8 +610,7 @@ For control problems where the answer should be a simple, inspectable controller
 
 For completeness, here are the three final controller bodies from the accepted runs. I keep them here because the details are part of the point: the final artifacts are small, inspectable programs rather than opaque policy checkpoints.
 
-<details markdown="1">
-<summary>Cart-link final controller: swing-up plus Riccati/LQR stabilizer</summary>
+### Cart-link final controller: swing-up plus Riccati/LQR stabilizer
 
 ```python
 # Harness-tunable parameters for CANDIDATE_0006_PARAMS.
@@ -728,10 +727,7 @@ def candidate_0006_controller(obs: dict) -> np.ndarray:
     return np.clip(u_total, -force_limit, force_limit)
 ```
 
-</details>
-
-<details markdown="1">
-<summary>Crowd evacuation final controller: local goal seeking, repulsion, corridor centering, stuck recovery</summary>
+### Crowd evacuation final controller: local goal seeking, repulsion, corridor centering, stuck recovery
 
 ```python
 # Harness-tunable parameters for CANDIDATE_0010_PARAMS.
@@ -824,10 +820,7 @@ def candidate_0010_controller(obs: dict) -> np.ndarray:
     return action.astype(float)
 ```
 
-</details>
-
-<details markdown="1">
-<summary>LunarLander final controller: descent schedule, attitude control, landing latch</summary>
+### LunarLander final controller: descent schedule, attitude control, landing latch
 
 ```python
 # Harness-tunable parameters for CANDIDATE_0009_PARAMS.
@@ -933,5 +926,3 @@ def candidate_0009_controller(obs: dict) -> np.ndarray:
 
     return np.array([main_action, side_action], dtype=float)
 ```
-
-</details>
