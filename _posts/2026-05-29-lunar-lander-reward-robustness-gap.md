@@ -13,15 +13,15 @@ toc:
 
 In the [previous post](https://jq-wei.github.io/blog/2026/heuristic-learning-control-harness/), I described a small heuristic-learning control harness: let an LLM inspect experiments, read trajectory diagnostics, edit controller code, tune exposed parameters, and keep a compact "whiteboard" between attempts.
 
-At the time, the LunarLander result was honest but incomplete. The harness had found a small handwritten controller that could land reliably, but it was still behind a pretrained SB3 PPO policy on Gym reward. That left an obvious question:
+However, the LunarLander result there was incomplete. The harness had found a small handwritten controller that could land reliably, but it was still behind a pretrained SB3 PPO policy on Gym reward. A follow-up question would be:
 
-> Can the same harness push a non-neural LunarLander controller toward PPO-level reward, and if it can, does that make it robust?
+> Can the same harness push a non-neural LunarLander controller toward PPO-level reward, and if it can, how about robustness of the controller?
 
 Short answer: yes, it can chase nominal reward surprisingly well. But when I moved robustness into the loop, the story became more interesting: the harness recovered much of the lost robustness, then exposed a very specific remaining failure mode.
 
 ## Starting point
 
-The parent controller was `candidate_0009`. It was already a real controller, not a toy. On the original run it reached terminal landing success with zero crashes:
+The parent controller was `candidate_0009` from the [previous post](https://jq-wei.github.io/blog/2026/heuristic-learning-control-harness/) . It was already a real controller, not a toy. On the original run it reached terminal landing success with zero crashes:
 
 | Candidate | Success mode | Terminal success | Crash rate | Reward mean | Steps mean |
 |---|---:|---:|---:|---:|---:|
@@ -123,11 +123,11 @@ On the holdout seeds it still passed:
 | Mean absolute side engine | 0.271 |
 | Final landing error mean | 0.077 |
 
-Because the gate was `271.3 - 5.0`, the holdout reward threshold was `266.3`. The controller cleared it, barely but legitimately.
+Because we have the gate as `271.3 - 5.0`, this controller got accepted. The controller cleared it, barely but legitimately.
 
 <img src="{{ '/assets/img/heuristic-learning-control/lunar_lander_candidate_0018_performance.gif' | relative_url }}" alt="LunarLander candidate 0018, the accepted performance-mode handwritten controller." width="75%">
 
-The behavior looks a little wobbly. That is not just a rendering artifact. The controller uses high-gain lateral and attitude correction, plus a relatively hard side-engine deadzone:
+The behavior looks a little shaking. The controller uses high-gain lateral and attitude correction, plus a relatively hard side-engine deadzone:
 
 ```python
 CANDIDATE_0018_PARAMS = {
@@ -144,7 +144,7 @@ CANDIDATE_0018_PARAMS = {
 }
 ```
 
-In plain English, it is:
+In other words, it is:
 
 1. Descend quickly when high above the pad.
 2. Switch to a soft vertical target near the ground.
@@ -212,24 +212,24 @@ Some representative rows:
 
 <img src="{{ '/assets/img/heuristic-learning-control/lunar_lander_robustness_candidate0018_vs_ppo_heatmap.png' | relative_url }}" alt="Robustness heatmap comparing zero, candidate 0018, and SB3 PPO terminal success across LunarLander perturbations." width="90%">
 
-There is an uncomfortable detail here: on the larger frozen seed set, `candidate_0018` even regressed on `standard_v0`, with terminal success `0.8` and mean reward `146.25`. That does not contradict the performance gate above. It says the gate was too small. The synthesis holdout was enough to catch many bad controllers, but not enough to certify broad seed robustness.
+There is an uncomfortable detail here: on the larger frozen seed set, `candidate_0018` even regressed on `standard_v0`, with terminal success `0.8` and mean reward `146.25`. That does not contradict the performance gate above. But rather says the gate was too small. The synthesis holdout was enough to catch many bad controllers, but not enough to certify broad seed robustness.
 
-This is exactly the kind of thing a harness should make visible.
+This is the kind of thing a harness should make visible.
 
-## What changed?
+## What changed
 
 The performance pass was real. The robustness failure was also real.
 
 My reading after `candidate_0018` was:
 
-1. `candidate_0009` was safer and slower.
+1. `candidate_0009` from previous blog was safer and slower.
 2. `candidate_0018` learned to spend reward budget more aggressively.
 3. The reward improvement came from faster descent and stronger attitude/lateral correction.
 4. That made the controller narrower.
 
 The wobbly GIF is the visual symptom of the same thing. The controller is actively trading angle, lateral velocity, and main-engine usage around a tuned descent schedule. It can look efficient on the sampled seeds and still be fragile when the effective physics change.
 
-For a handwritten controller, this is not surprising. High-gain switching logic often gives crisp nominal behavior before it gives robust behavior. The difference is that here the controller is small enough to diagnose.
+For a high-gain switching logic often gives crisp nominal behavior before it gives robust behavior.
 
 ## Putting robustness into the loop
 
@@ -346,7 +346,7 @@ candidate_0008 / heavy_weak_main_v0: terminal=0.90, reward=245.38
 SB3 PPO        / heavy_weak_main_v0: terminal=0.80, reward=221.47
 ```
 
-That is exactly the scenario I care about for this follow-up: heavier effective dynamics plus weaker main-engine authority. Under that perturbation, the small controller is better than the PPO checkpoint on both terminal success and reward.
+That is an important scenario: heavier effective dynamics plus weaker main-engine authority. Under that perturbation, the small controller is better than the PPO checkpoint on both terminal success and reward.
 
 The price is also clear: `candidate_0008` burns more fuel and lands more conservatively. In the matrix, its fuel-per-step is usually higher than PPO. It is less elegant, less efficient, and more cautious. But it is not a failed controller. It is a small inspectable controller with a slightly lower average reward and one very interesting robust-control-shaped win.
 
@@ -379,38 +379,4 @@ land -> land efficiently -> land efficiently under uncertainty
 
 This starts to look like a lightweight, program-search version of robust control. It is not H-infinity synthesis, tube MPC, or a formal min-max controller. But the shape is familiar: define an uncertainty set, preserve nominal performance, and improve worst-case behavior without using the hidden disturbance as an observation.
 
-The optimistic version of the result is:
 
-> A cheap LLM-guided harness can synthesize a small, inspectable controller that gets within a few percent of PPO average reward while showing a different, sometimes better, robustness profile.
-
-The sober version is:
-
-> Full robustness does not come for free. Reward chasing alone can destroy robustness, and even the better robust controller still trails PPO on average.
-
-Both are useful.
-
-## Next step
-
-The next run should not start from scratch. It should resume from `candidate_0008`, and it should be explicitly repair-only:
-
-```text
-Preserve:
-- zero crash rate
-- smoke robust avg terminal around 0.90
-- smoke robust worst terminal around 0.80
-- heavy_weak_main_v0 behavior, where candidate_0008 beats PPO
-
-Improve:
-- standard_v0 reward from ~260 toward PPO's ~271
-- main_weak_20 terminal from 0.80 toward 1.00
-- side_weak_20 and weak_attitude_control_v0 terminal from 0.80 toward 1.00
-- fuel-per-step without making the landing brittle
-
-Avoid:
-- replacing the controller family
-- adding scenario-name branches
-- trading robustness for a faster nominal descent
-- repeating the candidate_0018 failure pattern
-```
-
-The lesson is still mundane, but sharper now: if you want robustness, put robustness into the harness. And if a controller already has a good robustness shape, do not let the next LLM turn casually overwrite that shape.
