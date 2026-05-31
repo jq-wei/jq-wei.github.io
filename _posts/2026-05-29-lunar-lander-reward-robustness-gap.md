@@ -2,7 +2,7 @@
 layout: post
 title: "When Reward Chasing Meets Robustness"
 date: 2026-05-29 22:30:00
-description: A follow-up LunarLander lab note: an LLM-guided handwritten controller reaches PPO-like reward, then exposes the tradeoff between nominal performance and robustness.
+description: "A follow-up LunarLander lab note: an LLM-guided handwritten controller reaches PPO-like reward, then exposes the tradeoff between nominal performance and robustness."
 tags: llm-agents control heuristic-learning reinforcement-learning robustness lunar-lander
 categories: llm-agents
 giscus_comments: true
