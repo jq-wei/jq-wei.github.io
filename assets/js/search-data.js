@@ -37,15 +37,15 @@ ninja.data = [{
               handler: () => {
                 window.location.href = "/blog/";
               },
-            },{id: "post-",
+            },{id: "post-when-reward-chasing-meets-robustness",
         
-          title: "",
+          title: "When Reward Chasing Meets Robustness",
         
-        description: "",
+        description: "A follow-up LunarLander lab note: an LLM-guided handwritten controller reaches PPO-like reward, then exposes the tradeoff between nominal performance and robustness.",
         section: "Posts",
         handler: () => {
           
-            window.location.href = "/blog/2026/2026-05-29-lunar-lander-reward-robustness-gap/";
+            window.location.href = "/blog/2026/lunar-lander-reward-robustness-gap/";
           
         },
       },{id: "post-heuristic-learning-for-control-building-a-harness-beyond-gradients",
