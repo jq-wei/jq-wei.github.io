@@ -37,7 +37,18 @@ ninja.data = [{
               handler: () => {
                 window.location.href = "/blog/";
               },
-            },{id: "post-heuristic-learning-for-control-building-a-harness-beyond-gradients",
+            },{id: "post-",
+        
+          title: "",
+        
+        description: "",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/2026-05-29-lunar-lander-reward-robustness-gap/";
+          
+        },
+      },{id: "post-heuristic-learning-for-control-building-a-harness-beyond-gradients",
         
           title: "Heuristic Learning for Control: Building a Harness Beyond Gradients",
         
