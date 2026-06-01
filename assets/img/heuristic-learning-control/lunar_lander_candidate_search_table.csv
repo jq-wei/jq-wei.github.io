@@ -1,0 +1,17 @@
+candidate,idx,accepted,nominal_reward,terminal_success,crash_rate_est,steps_delta,target_met,robust_mean_gate,robust_min_gate,robust_crash_gate,robust_terminal_mean,robust_terminal_min,robust_crash_mean,robust_reward_mean,worst_scenario
+candidate_0001,1,False,239.59205634494296,0.0,0.0,262.0,False,False,False,False,0.475,0.0,0.22499999999999998,154.55907246120015,heavy_weak_main_v0
+candidate_0002,2,False,18.740203344942984,0.0,0.666667,130.666667,False,False,False,False,0.0,0.0,0.875,-31.960264978092482,standard_v0
+candidate_0003,3,False,243.08271734494295,0.0,0.0,224.666667,False,False,False,True,0.6,0.5,0.0,226.9985664194474,gravity_high_20
+candidate_0004,4,False,248.346613344943,1.0,0.0,334.0,False,False,False,True,0.8,0.6,0.0,232.97786394338567,heavy_weak_main_v0
+candidate_0006,6,False,261.572070344943,1.0,0.0,260.333333,False,False,False,True,0.825,0.7,0.0,241.6250651551372,heavy_weak_main_v0
+candidate_0007,7,False,272.88750834494294,1.0,0.0,203.666667,True,False,False,True,0.75,0.5,0.0,237.74662999264683,heavy_weak_main_v0
+candidate_0008,8,False,262.4280443449429,1.0,0.0,244.666667,False,True,True,True,0.9,0.8,0.0,252.1602284978159,main_weak_20
+candidate_0009,9,False,273.478725344943,1.0,0.0,183.666667,True,False,False,True,0.775,0.4,0.0,228.226720942633,heavy_weak_main_v0
+candidate_0010,10,False,232.97200534494297,0.666667,0.0,382.666667,False,False,False,False,0.19999999999999998,0.0,0.3,87.91307134062369,heavy_weak_main_v0
+candidate_0012,12,False,168.10588334494295,0.0,0.0,246.333333,False,False,False,False,0.35,0.0,0.3,108.65809058151417,heavy_weak_main_v0
+candidate_0013,13,False,273.084493344943,1.0,0.0,197.666667,True,False,False,False,0.35000000000000003,0.0,0.3,92.07027746553018,heavy_weak_main_v0
+candidate_0015,15,False,273.029010344943,1.0,0.0,205.333333,True,False,False,False,0.375,0.0,0.3,102.8835574457911,heavy_weak_main_v0
+candidate_0016,16,False,262.557120344943,0.666667,0.0,219.333333,False,False,False,False,0.7,0.0,0.1,181.70249826069616,heavy_weak_main_v0
+candidate_0018,18,False,272.761940344943,1.0,0.0,186.666667,True,False,False,False,0.375,0.0,0.3,97.45700001426974,heavy_weak_main_v0
+candidate_0019,19,False,275.36687434494297,1.0,0.0,161.333333,True,False,False,False,0.1,0.0,0.675,12.63741096570309,gravity_high_20
+candidate_0020,20,False,240.03317534494298,1.0,0.0,376.333333,False,False,False,False,0.475,0.0,0.175,162.3944365467265,heavy_weak_main_v0
