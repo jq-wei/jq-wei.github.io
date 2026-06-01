@@ -229,7 +229,11 @@ My reading after `candidate_0018` was:
 
 The wobbly GIF is the visual symptom of the same thing. The controller is actively trading angle, lateral velocity, and main-engine usage around a tuned descent schedule. It can look efficient on the sampled seeds and still be fragile when the effective physics change.
 
-For a high-gain switching logic often gives crisp nominal behavior before it gives robust behavior.
+The spec ladder is easier to see if the three key controllers are put side by side:
+
+<img src="{{ '/assets/img/heuristic-learning-control/lunar_lander_spec_ladder_metrics.png' | relative_url }}" alt="Spec ladder from terminal landing to performance reward chasing to robust-performance tradeoff." width="90%">
+
+For me, this is the warning sign: high-gain switching logic often gives crisp nominal behavior before it gives robust behavior.
 
 ## Putting robustness into the loop
 
@@ -293,6 +297,12 @@ On the main run:
 | Robust smoke crash rate | 0.00 |
 | Robust smoke reward mean | 252.16 |
 
+The candidate search curve is the most useful visual from this phase. The top panel shows nominal reward climbing toward the PPO reference. The bottom panel shows why reward alone is not enough: several later candidates reached high nominal reward while the robustness probe collapsed.
+
+<img src="{{ '/assets/img/heuristic-learning-control/lunar_lander_candidate_search_curve.png' | relative_url }}" alt="Candidate search curve showing nominal reward rising while robustness can collapse." width="95%">
+
+This is the picture I would use to explain the harness loop. It is not a smooth gradient descent curve, but it is an optimization trace in code space: each point is a candidate controller, and the whiteboard compresses the previous failures into the next edit request.
+
 This did not beat PPO's nominal reward. But the gap was small enough to matter differently: it was now a question of tradeoffs, not failure. The controller landed reliably, remained interpretable, and behaved well under the smoke perturbations.
 
 <img src="{{ '/assets/img/heuristic-learning-control/lunar_lander_candidate_0008_robust_performance.gif' | relative_url }}" alt="LunarLander candidate 0008, a conservative robust-performance handwritten controller." width="75%">
@@ -337,6 +347,12 @@ Some representative rows:
 
 <img src="{{ '/assets/img/heuristic-learning-control/lunar_lander_robustness_candidate0008_vs_ppo_heatmap.png' | relative_url }}" alt="Robustness heatmap comparing zero, candidate 0008, and SB3 PPO terminal success across LunarLander perturbations." width="90%">
 
+The same data is also useful as a small Pareto-style frontier. Here the x-axis is nominal reward and the y-axis is worst-case terminal success over the smoke robustness probe.
+
+<img src="{{ '/assets/img/heuristic-learning-control/lunar_lander_pareto_reward_vs_robustness.png' | relative_url }}" alt="Nominal reward versus worst-case robustness frontier across LunarLander candidates." width="92%">
+
+That plot is the compact version of the story: `candidate_0018` chased reward and lost robustness, while `candidate_0008` gave up some nominal reward to recover the robustness gate. The PPO checkpoint is still the stronger full-suite baseline, but the handwritten controller is no longer obviously out of the game.
+
 The full-suite mean reward gap is about `6.86` reward points, or roughly `2.6%` of PPO's mean. That is smaller than I expected for a compact handwritten controller. PPO is still more efficient on most rows, especially the nominal and actuator-weak cases, but `candidate_0008` has a different robustness profile.
 
 The most interesting row is the stress case:
@@ -379,4 +395,20 @@ land -> land efficiently -> land efficiently under uncertainty
 
 This starts to look like a lightweight, program-search version of robust control. It is not H-infinity synthesis, tube MPC, or a formal min-max controller. But the shape is familiar: define an uncertainty set, preserve nominal performance, and improve worst-case behavior without using the hidden disturbance as an observation.
 
+## What this does not prove yet
 
+There is one claim I do not want to overstate. The plots above show that the full harness can move through a useful sequence of controller specifications. They do not yet prove, by themselves, that the whiteboard is the causal reason.
+
+Historically, the early LunarLander attempts before the environment digest, trajectory diagnostics, and robust whiteboard were much harder to steer. That is useful evidence from the lab notebook, but it is not a controlled ablation: the prompt, diagnostics, objective, and harness code were all changing at the same time.
+
+The controlled ablation I would run next is straightforward:
+
+| Condition | What changes |
+|---|---|
+| Full harness | Environment digest, candidate summaries, reflection, and whiteboard. |
+| No reflection | Keep latest metrics, remove natural-language reflection. |
+| No candidate summaries | Keep current metrics, remove accumulated candidate memory. |
+| No environment digest | Remove the explicit observation/action/reward/dynamics summary. |
+| No whiteboard | Give only the current run metrics and source files. |
+
+The figure to report would be the same code-search curve above, repeated for each condition: candidate iteration on the x-axis, reward and robustness on the y-axis. If the full-whiteboard curve reaches the robust-performance gate in fewer candidates, then the whiteboard stops being just a nice engineering convenience and becomes load-bearing evidence.
