@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "RL fundamental-part 1"
-date: 2026-06-08 22:30:00
+date: 2026-06-08 20:00:00
 description: "Notes on reinforcement learning basics, policy gradients, PPO, DDPG, SAC, RLHF, and GRPO."
 tags: reinforcement-learning post-training llm rl grpo
 categories: reinforcement-learning
