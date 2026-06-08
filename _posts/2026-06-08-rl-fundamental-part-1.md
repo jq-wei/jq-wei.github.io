@@ -276,11 +276,7 @@ which describes how much better it is to take a specific action a  in state s
 
 # Types of RL algorithms
 
-<img
-  class="rl-post-figure"
-  src="{{ '/assets/img/rl-fundamental-part-1/image.png' | relative_url }}"
-  alt="Types of reinforcement learning algorithms"
->
+![Types of reinforcement learning algorithms]({{ '/assets/img/rl-fundamental-part-1/image.png' | relative_url }}){: .rl-post-figure }
 
 We mainly focus on model-free RL. Model-based RL algorithm includes world models, dreamers etc. For model free RL, there are mainly two approaches.
 
@@ -516,11 +512,7 @@ $$
 E_{x\sim P_\theta} [\nabla_\theta \log P_\theta (x)] = 0.
 $$
 
-<img
-  class="rl-post-figure rl-post-figure--proof"
-  src="{{ '/assets/img/rl-fundamental-part-1/Screenshot_2025-02-23_234607.png' | relative_url }}"
-  alt="Proof of expected grad-log-prob lemma"
->
+![Proof of expected grad-log-prob lemma]({{ '/assets/img/rl-fundamental-part-1/Screenshot_2025-02-23_234607.png' | relative_url }}){: .rl-post-figure .rl-post-figure--proof }
 
 ### Don’t let the past distract you
 
@@ -665,11 +657,7 @@ VPG trains a stochastic policy in an on-policy way. This means that it explores 
 
 ## Pseudocode
 
-<img
-  class="rl-post-figure rl-post-figure--wide"
-  src="{{ '/assets/img/rl-fundamental-part-1/262538f3077a7be8ce89066abbab523575132996.svg' | relative_url }}"
-  alt="Vanilla policy gradient pseudocode"
->
+![Vanilla policy gradient pseudocode]({{ '/assets/img/rl-fundamental-part-1/262538f3077a7be8ce89066abbab523575132996.svg' | relative_url }}){: .rl-post-figure .rl-post-figure--wide }
 
 Here $\phi$  is NN for value function $V$, and $\theta$  for policy network.
 
@@ -820,11 +808,7 @@ Since the advantage is negative, the obj will increase if the action becomes les
 
 ## Pseudocode
 
-<img
-  class="rl-post-figure rl-post-figure--wide"
-  src="{{ '/assets/img/rl-fundamental-part-1/e62a8971472597f4b014c2da064f636ffe365ba3.svg' | relative_url }}"
-  alt="PPO pseudocode"
->
+![PPO pseudocode]({{ '/assets/img/rl-fundamental-part-1/e62a8971472597f4b014c2da064f636ffe365ba3.svg' | relative_url }}){: .rl-post-figure .rl-post-figure--wide }
 
 Here $\phi$  is NN for value function $V$, and $\theta$  for policy network.
 
@@ -927,11 +911,7 @@ $$
 
 ## Pseudocode
 
-<img
-  class="rl-post-figure rl-post-figure--wide"
-  src="{{ '/assets/img/rl-fundamental-part-1/5811066e89799e65be299ec407846103fcf1f746.svg' | relative_url }}"
-  alt="DDPG pseudocode"
->
+![DDPG pseudocode]({{ '/assets/img/rl-fundamental-part-1/5811066e89799e65be299ec407846103fcf1f746.svg' | relative_url }}){: .rl-post-figure .rl-post-figure--wide }
 
 # Alg 5: SAC
 
@@ -1129,19 +1109,11 @@ Also, instead of adding KL divergence in the reward, GRPO regularizes by directl
 
 After this reading, the following figure makes sense:
 
-<img
-  class="rl-post-figure"
-  src="{{ '/assets/img/rl-fundamental-part-1/Screenshot_2025-02-27_115038.png' | relative_url }}"
-  alt="GRPO concept figure"
->
+![GRPO concept figure]({{ '/assets/img/rl-fundamental-part-1/Screenshot_2025-02-27_115038.png' | relative_url }}){: .rl-post-figure }
 
 The pseudocode is given as
 
-<img
-  class="rl-post-figure rl-post-figure--wide"
-  src="{{ '/assets/img/rl-fundamental-part-1/Screenshot_2025-02-27_115055.png' | relative_url }}"
-  alt="GRPO pseudocode"
->
+![GRPO pseudocode]({{ '/assets/img/rl-fundamental-part-1/Screenshot_2025-02-27_115055.png' | relative_url }}){: .rl-post-figure .rl-post-figure--wide }
 
 ### Note
 
