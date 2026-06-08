@@ -37,7 +37,18 @@ ninja.data = [{
               handler: () => {
                 window.location.href = "/blog/";
               },
-            },{id: "post-when-reward-chasing-meets-robustness",
+            },{id: "post-rl-fundamental-part-1",
+        
+          title: "RL fundamental-part 1",
+        
+        description: "Notes on reinforcement learning basics, policy gradients, PPO, DDPG, SAC, RLHF, and GRPO.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/rl-fundamental-part-1/";
+          
+        },
+      },{id: "post-when-reward-chasing-meets-robustness",
         
           title: "When Reward Chasing Meets Robustness",
         
