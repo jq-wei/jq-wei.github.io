@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "From LunarLander to String-Stable Platooning"
-date: 2026-06-11 22:20:00
+date: 2026-06-11 22:20:00 +0200
 description: "A stage-one decentralized platooning result: an LLM-guided handwritten controller suppresses string amplification under delay, noise, and heterogeneous actuation."
 tags: llm-agents control heuristic-learning reinforcement-learning robustness platooning multi-agent
 categories: llm-agents
