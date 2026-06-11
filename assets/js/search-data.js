@@ -37,7 +37,18 @@ ninja.data = [{
               handler: () => {
                 window.location.href = "/blog/";
               },
-            },{id: "post-rl-fundamental-part-1",
+            },{id: "post-from-lunarlander-to-string-stable-platooning",
+        
+          title: "From LunarLander to String-Stable Platooning",
+        
+        description: "A stage-one decentralized platooning result: an LLM-guided handwritten controller suppresses string amplification under delay, noise, and heterogeneous actuation.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/platooning-string-stability-harness/";
+          
+        },
+      },{id: "post-rl-fundamental-part-1",
         
           title: "RL fundamental-part 1",
         
