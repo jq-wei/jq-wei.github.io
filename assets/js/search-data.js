@@ -41,7 +41,7 @@ ninja.data = [{
         
           title: "From LunarLander to String-Stable Platooning",
         
-        description: "A stage-one decentralized platooning result: an LLM-guided handwritten controller suppresses string amplification under delay, noise, and heterogeneous actuation.",
+        description: "An LLM-guided handwritten controller suppresses string amplification under delay, noise, and heterogeneity; a tuned robust CACC baseline then clarifies the real boundary.",
         section: "Posts",
         handler: () => {
           
