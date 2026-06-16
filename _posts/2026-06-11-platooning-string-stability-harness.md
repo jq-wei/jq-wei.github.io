@@ -2,7 +2,7 @@
 layout: post
 title: "From LunarLander to String-Stable Platooning"
 date: 2026-06-11 22:20:00 +0200
-description: "A stage-one decentralized platooning result: an LLM-guided handwritten controller suppresses string amplification under delay, noise, and heterogeneous actuation."
+description: "An LLM-guided handwritten controller suppresses string amplification under delay, noise, and heterogeneity; a tuned robust CACC baseline then clarifies the real boundary."
 tags: llm-agents control heuristic-learning reinforcement-learning robustness platooning multi-agent
 categories: llm-agents
 giscus_comments: true
@@ -17,7 +17,7 @@ But LunarLander also has a weakness as a research benchmark. A good language mod
 
 > Can the same harness synthesize a decentralized multi-agent controller where the target is not just reward, but string stability under delay and uncertainty?
 
-This post records the first stage-one result on a vehicle platooning environment. It is not yet a final benchmark, but it is a useful step: the harness produced a local, non-neural controller that keeps a 20-vehicle platoon safe and suppresses downstream error amplification in a hard delay/noise scenario.
+This post records the platooning experiment end to end. It started with a clean stage-one result on delay and noise, then moved through hard heterogeneity, and finally hit a useful limit on a combined stress test. The final result is not a proof of worst-case string stability, but it is more interesting than a single nice rollout: the harness produced local, non-neural controllers that are clearly better than simple classical baselines under the hard combined setting, while a later Optuna-tuned robust CACC baseline showed that the strongest result is better read as competitive controller synthesis, not as a claim that LLM search dominates all tuned classical designs.
 
 ## Why platooning?
 
@@ -29,30 +29,24 @@ That makes string stability a natural target for this harness. It also moves the
 
 ## Environment
 
-The current target scenario is `hard_delay_noise_v1`.
+The experiment used a small environment ladder rather than a single fixed task.
 
 The simulator is lightweight: a scripted leader and 19 followers, where the same decentralized controller is applied to each follower. Each follower only sees local predecessor information.
 
-The stressors are:
+The first hard target was `hard_delay_noise_v1`. After that passed, I moved to `hard_heterogeneous_v1`, and then to `hard_combo_v1`.
 
-| Ingredient | Setting |
-|---|---:|
-| Vehicles | 20 |
-| Time step | 0.1 |
-| Horizon | 600 |
-| Leader profile | repeated hard braking |
-| Observation delay | 3 steps |
-| Delay jitter | up to 3 steps |
-| Predecessor acceleration dropout | 0.35 |
-| Observation noise | enabled |
-| Gap / relative velocity bias | enabled |
+| Scenario | Added stressors | Purpose |
+|---|---|---|
+| `hard_delay_noise_v1` | repeated hard braking, 3-step observation delay, up to 3 extra jitter steps, 0.35 predecessor-acceleration dropout, observation noise, fixed sensor bias | Can the controller suppress string amplification with delayed and unreliable local observations? |
+| `hard_heterogeneous_v1` | repeated hard braking, broad actuator lag/limit spread, one weak-braking mid-platoon vehicle | Can the controller handle vehicle-to-vehicle dynamics mismatch? |
+| `hard_combo_v1` | repeated hard braking, variable delay/noise, 0.40 acceleration dropout, sensor bias, heterogeneous dynamics, weak braking | Does the design survive when the stressors are combined? |
 
 The key metric is `string_peak_gain`. It is computed from peak spacing errors along the platoon, using the maximum of:
 
 - neighbor peak amplification: downstream peak error divided by upstream peak error
 - tail peak amplification: tail peak error divided by the first follower peak error
 
-For this round, I added a dedicated `string_performance` success mode. The main gate was:
+For these rounds, I added a dedicated `string_performance` success mode. The main gate was:
 
 ```text
 string_peak_gain_max <= 1.35
@@ -63,9 +57,11 @@ success_rate high enough on train and holdout
 
 This matters because earlier performance-style runs could pass too easily by finding a safe-enough controller with a loose negative reward target. The new mode makes the platooning claim explicit: suppress amplification.
 
-## Accepted controller
+One detail is worth spelling out because it changes how I read the later failures. The random seeds are not mainly making the cars start unrealistically close together. With the default `d0 = 8`, `time_headway = 1`, and `nominal_speed = 20`, the desired initial gap is about 28 meters, with only +/- 0.5 meters of initial gap jitter. In `hard_combo_v1`, the hard part is the interaction of delay, dropout, noise, bias, heterogeneous actuation, and repeated braking.
 
-The current best controller is `candidate_0010`, resumed from the `hard_delay_noise_v1` platooning run and accepted under `string_performance`.
+## First accepted controller
+
+The first accepted hard-scenario controller was `candidate_0010`, resumed from the `hard_delay_noise_v1` platooning run and accepted under `string_performance`.
 
 On the target scenario it passed both train and holdout gates:
 
@@ -176,35 +172,145 @@ The peak-error propagation plot is closer to the string-stability question:
 
 These plots are useful because the raw reward can hide the mechanism. A controller can have a worse reward because it keeps larger safety margins, but still be better for the networked-control objective if it prevents amplification and collisions.
 
+## Harder ladder
+
+After the first acceptance, I pushed the same harness up the hard-scenario ladder. This is where the experiment became more informative.
+
+One small naming caveat: candidate names are local to a run. The `candidate_0010` in the hard-heterogeneous run is a new candidate in that run, not literally the same file as the `hard_delay_noise_v1` candidate above.
+
+The ladder result was:
+
+| Stage | Scenario | Best candidate | Train success | Holdout / fresh success | Collision | Max string gain | Status |
+|---|---|---|---:|---:|---:|---:|---|
+| Delay/noise | `hard_delay_noise_v1` | `candidate_0010` | 1.000 | 1.000 holdout | 0.000 | 1.170 holdout | accepted |
+| Heterogeneous | `hard_heterogeneous_v1` | `candidate_0010` | 1.000 | 1.000 holdout | 0.000 | 0.753 holdout | accepted |
+| Combined | `hard_combo_v1` | `candidate_0002` | 1.000 | 0.800 holdout / 0.900 fresh-50 | 0.000 | 1.544 holdout / 1.801 fresh-50 | not accepted |
+
+The hard-heterogeneous result was cleaner than I expected. With broad actuator lag/limit spread and one weak-braking vehicle, the accepted candidate passed both train and holdout with low spacing error:
+
+| Split | Seeds | Success | Collision | Min gap | Spacing RMS | Mean string peak gain | Max string peak gain | Reward |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Train | 0, 1, 2 | 1.000 | 0.000 | 15.818 | 0.062 | 0.616 | 0.706 | -5.89 |
+| Holdout | 799010, 111609, 813424, 667812, 893411 | 1.000 | 0.000 | 15.972 | 0.060 | 0.574 | 0.753 | -5.62 |
+
+`hard_combo_v1` changed the story. It combines the previous stressors: repeated leader braking, delay jitter, observation noise, acceleration dropout, sensor bias, heterogeneous dynamics, and a weak-braking follower. The best useful candidate there was `candidate_0002`.
+
+On the original train seeds, `candidate_0002` passed. On the fixed holdout seeds, it failed the string-performance gate:
+
+| Split | Seeds | Success | Collision | Min gap | Spacing RMS | Mean string peak gain | Max string peak gain | Reward |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Train | 0, 1, 2 | 1.000 | 0.000 | 7.938 | 1.273 | 0.958 | 1.216 | -1047.03 |
+| Holdout | 799010, 111609, 813424, 667812, 893411 | 0.800 | 0.000 | 8.560 | 1.212 | 1.039 | 1.544 | -923.40 |
+
+The holdout failure was seed `893411`: no collision, a healthy minimum gap, but `string_peak_gain = 1.544`, above the 1.35 gate. That is a qualitatively different failure from the simple baselines crashing.
+
+I tried one more small repair loop. It was instructive but not a win. A later `candidate_0009` passed the original train seeds but made the holdout worse, with success 0.600, collision 0.200, and max string gain 3.321. A later `candidate_0012` fixed seed `893411` on a five-seed middle gate, but failed seeds `0` and `667812`, ending at success 0.600 and max string gain 1.372. In other words, the repair was trading one tail failure for another.
+
+At that point the right move was not another 20-round LLM run. It was a fresh-seed sweep.
+
+## Fresh-seed sweep
+
+I evaluated `candidate_0002`, the later `candidate_0012`, three simple baselines, and then a tuned robust CACC baseline on the same 50 fresh `hard_combo_v1` seeds.
+
+| Controller | Success | Collision | Spacing RMS | Mean string gain | P95 string gain | Max string gain | Reward | Failed |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| `optuna_robust_cacc_shared` | 0.920 | 0.000 | 1.156 | 1.054 | 1.472 | 1.669 | -841.15 | 4/50 |
+| `candidate_0002` | 0.900 | 0.000 | 1.206 | 1.049 | 1.477 | 1.801 | -938.27 | 5/50 |
+| `candidate_0012` | 0.580 | 0.000 | 1.492 | 1.398 | 1.853 | 3.215 | -1383.32 | 21/50 |
+| `acc_pd` | 0.000 | 1.000 | 2.791 | 2.904 | 4.302 | 5.074 | -11879.94 | 50/50 |
+| `cacc` | 0.000 | 0.920 | 3.010 | 6.772 | 11.875 | 20.858 | -12764.22 | 50/50 |
+| `damped_cacc` | 0.000 | 1.000 | 4.706 | 3.758 | 6.446 | 9.238 | -14928.90 | 50/50 |
+
+This table changed my interpretation twice. First, `candidate_0002` is not just a seed-specific patch: on 50 unseen seeds it stayed collision-free and passed 45 out of 50. But it is also not a worst-case string-stable controller. The five failed seeds were all string-gain tail failures, not collisions:
+
+| Seed | Collision | Min gap | Spacing RMS | String peak gain |
+|---:|---:|---:|---:|---:|
+| 781245 | false | 8.283 | 1.241 | 1.520 |
+| 775016 | false | 7.022 | 1.757 | 1.523 |
+| 468502 | false | 10.231 | 0.883 | 1.801 |
+| 612709 | false | 7.787 | 1.294 | 1.424 |
+| 804226 | false | 10.576 | 1.158 | 1.357 |
+
+Second, the tuned baseline matters, but it should be interpreted carefully. This was not an independent robust CACC design dropped in from nowhere. It was a second-stage baseline built from the structure exposed by the LLM-discovered controller: damping, predecessor-acceleration filtering/feedforward, command smoothing, jerk limiting, emergency braking, and capped catch-up. Once I gave that robust CACC-shaped family a fair Optuna tuning loop, it reached 46 out of 50 fresh seeds, stayed collision-free, and slightly improved the worst observed string gain compared with the raw LLM candidate.
+
+That makes the endpoint clearer and less inflated. The harness found a much stronger controller than the simple baselines for this hard combined setting. But the final result is not "LLM beats classical control." It is closer to: the LLM-guided harness discovered a useful robust-CACC-like structure, and Optuna then refined that structure slightly better than the raw LLM candidate.
+
+There is also a prior-knowledge caveat. The structure is not novel in the control-theoretic sense. Most of its ingredients are familiar CACC or robust-control motifs: damping, feedforward, filtering, smoothing, jerk limits, safety guards, and string-stability-oriented objectives. A language model may well have seen these patterns in papers, code, or technical explanations. So the result should not be read as "the LLM invented CACC." It is better read as an engineering result: the harness could assemble known motifs, adapt them to this custom simulator and hard metric, and turn them into a runnable controller through failure-driven iteration.
+
+## Tuned robust CACC baseline
+
+The Optuna baseline was deliberately not a neural controller. It was also not meant to be a fully independent baseline. I fixed a robust CACC-like controller family by distilling the mechanisms that kept appearing in the successful LLM candidates, especially `candidate_0002`, and then tuned only its gains and thresholds:
+
+- spacing feedback
+- relative-velocity damping
+- predecessor-acceleration feedforward
+- own-acceleration damping
+- predecessor-acceleration filtering
+- delay-aware feedforward decay
+- command smoothing
+- jerk limiting
+- gap/time-to-collision emergency braking
+- capped catch-up acceleration
+
+There is one important fairness caveat. During inspection, I found that the strong LLM candidate effectively uses rollout-local shared smoothing/filter state. A strictly per-follower-memory Optuna controller could not reproduce that behavior. So I used `optuna_robust_cacc_shared`, which allows the same kind of rollout-local shared state but resets it at the start of each rollout and seed. This is a fair comparison to the discovered candidate, but it is not the same as proving a strictly decentralized per-follower memory design.
+
+This makes the comparison three-layered:
+
+| Layer | What it tests | Fresh-50 result |
+|---|---|---:|
+| Simple hand baselines: `acc_pd`, `cacc`, `damped_cacc` | Default classical controllers under the hard combined stressor | 0/50 success |
+| LLM-discovered controller: `candidate_0002` | Can the harness discover a useful controller structure? | 45/50 success |
+| LLM-structured + Optuna-tuned: `optuna_robust_cacc_shared` | Can numerical tuning refine the discovered structure? | 46/50 success |
+
+The tuned baseline's training and holdout metrics were:
+
+| Split | Seeds | Success | Collision | Spacing RMS | Mean string peak gain | Max string peak gain | Reward |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Train | 20 mixed seeds | 1.000 | 0.000 | 1.103 | 0.994 | 1.325 | -759.51 |
+| Holdout | 799010, 111609, 813424, 667812, 893411 | 0.800 | 0.000 | 1.183 | 1.322 | 2.319 | -869.83 |
+
+That holdout max gain looks worse than `candidate_0002`, but the broader Fresh-50 result was slightly better. This is exactly why the fresh sweep was useful: a five-seed gate can overstate or understate tail behavior depending on which rare cases it samples.
+
 ## Interpretation
 
-This result is the first stage where the harness feels like it is aiming at a real networked-control property rather than just solving another benchmark.
+This result is the point where the harness feels like it is aiming at a real networked-control property rather than just solving another benchmark.
 
 The claim I would make is modest:
 
-1. The harness can synthesize an interpretable decentralized controller that is competitive with simple hand-designed baselines.
+1. The harness can synthesize an interpretable controller that is much stronger than simple hand-designed baselines on the hard combined platooning setting.
 2. Adding `string_performance` changes the search pressure in the right direction.
 3. The discovered controller is not magic; it looks like a plausible robust local CACC variant.
-4. The current scenario is useful, but not yet hard enough to be a final paper benchmark.
+4. A strong tuned robust CACC baseline can match or slightly exceed the best LLM-discovered hard-combo candidate, but that baseline reuses the controller family suggested by the LLM search.
+5. The current result is statistical and empirical, not a formal guarantee.
+6. The hard-combo failures identify a real next problem: rare string-gain amplification without collision.
 
-That last point matters. This is not a proof of formal string stability. It is also not a full industrial platooning stack. It is a controlled experiment showing that an LLM-guided code-search loop can move toward a network-level control objective when the objective is made explicit.
+The guarantee point matters. This is not a proof of formal string stability. It is also not a full industrial platooning stack. It is a controlled experiment showing that an LLM-guided code-search loop can move toward a network-level control objective when the objective is made explicit. The tuned-baseline result makes the story healthier: the harness is useful less as a final numerical optimizer and more as a structure-discovery loop. Once the right controller family is exposed, ordinary black-box tuning can do what it is good at: calibrate gains and thresholds.
 
 ## What this does not yet prove
 
 This stage does not yet prove:
 
 - formal string stability
+- worst-case robustness over all random seeds or all uncertainty realizations
 - scalability to 50 or 100 vehicles
 - robustness to burst communication loss
 - robustness to cut-in or cut-out events
 - superiority over a tuned MPC or formally designed robust CACC controller
+- superiority over carefully tuned robust baselines; the Optuna-tuned robust CACC baseline slightly outperformed the best hard-combo LLM candidate on this Fresh-50 suite
+- strict decentralization if rollout-local shared smoothing/filter state is disallowed
 - that the whiteboard mechanism is causally necessary
 
 The last point is especially important. The right ablation is not another nice GIF. It is a code-search curve: full whiteboard versus no whiteboard, no reflection, no previous-candidate summaries, and random/no-whiteboard baselines.
 
 ## Next
 
-The next environment ladder should make the task harder in dimensions that matter for networked control:
+For this stage, I would stop here.
+
+The experiment has done enough to be useful: it produced accepted controllers for delay/noise and heterogeneity, found a strong but imperfect hard-combo controller, and then showed on 50 fresh seeds that the remaining issue is tail string-gain amplification rather than collision avoidance. Another round of single-seed patching would be less informative than changing the evaluation protocol.
+
+The Optuna baseline adds one more useful closure: the best hard-combo LLM candidate is genuinely strong, but not uniquely strong. A tuned robust CACC family can reach the same regime. That is a better endpoint than an easy win over weak baselines.
+
+If I continue this line, the next version should make the task harder in dimensions that matter for networked control and report robustness more directly:
 
 1. Scale from 20 vehicles to 50 vehicles.
 2. Use bursty packet dropout, not only independent acceleration dropout.
@@ -214,16 +320,17 @@ The next environment ladder should make the task harder in dimensions that matte
 6. Add sensor bias that drifts slowly during the rollout.
 7. Add cut-in, cut-out, or platoon split/merge events.
 8. Report a Pareto frontier: nominal reward versus worst-case string gain.
+9. Separate strictly per-follower memory controllers from rollout-local shared-state controllers.
 
 For the next acceptance target, I would keep:
 
 ```text
 collision_rate = 0
-success_rate >= 0.9 on full suite
-string_peak_gain_max <= 1.35 on holdout
+success_rate >= 0.9 on a fresh-seed suite
+string_peak_gain_max <= 1.35 on fixed holdout and fresh seeds
 ```
 
-but add a full-suite robustness metric so a controller cannot overfit only the training scenario.
+but add a full-suite robustness metric so a controller cannot overfit only the training scenario. I would also keep the tuned robust CACC baseline in the loop from the start, and add a stronger model-based baseline such as MPC if the goal is to make a broader control claim.
 
 ## Reproduction
 
@@ -252,3 +359,73 @@ The output folder was:
 experiments/platooning_robustness/20260611-215844-179716
 ```
 
+The hard-heterogeneous accepted run was:
+
+```text
+harness_runs/platooning/hard_heterogeneous_v1/zero/run_20260611-234904-746176_round001_seeds0-1-2
+candidate_0010
+```
+
+The best hard-combo parent was:
+
+```text
+harness_runs/platooning/hard_combo_v1/zero/run_20260612-080317-420061_round001_seeds0-1-2
+candidate_0002
+```
+
+The 50-seed hard-combo sweep outputs were:
+
+```text
+experiments/platooning_seed_sweep/candidate_0002/20260612-212849-088659
+experiments/platooning_seed_sweep/candidate_0012/20260612-213007-156787
+experiments/platooning_seed_sweep/acc_pd/20260613-115748-824820
+experiments/platooning_seed_sweep/cacc/20260613-115749-139933
+experiments/platooning_seed_sweep/damped_cacc/20260613-115748-823188
+experiments/platooning_seed_sweep/optuna_robust_cacc_shared/20260613-115449-551506
+```
+
+For example, the fresh-seed sweep for `candidate_0002` was:
+
+```bash
+SEEDS=(58421 92734 140569 203847 286105 319774 401226 452991 506318 537902 \
+  590144 641337 682019 734508 781245 826730 874192 918604 963771 995318 \
+  12763 68244 155902 236481 309115 370226 429884 493021 558730 604118 \
+  665902 719443 775016 831557 889201 944602 982331 34791 101884 178223 \
+  249650 333908 391770 468502 522614 612709 706381 804226 871009 953440)
+
+PYTHONPATH=harness_runs/platooning/hard_combo_v1/zero/run_20260612-080317-420061_round001_seeds0-1-2/candidates/candidate_0002/candidate_workspace/src \
+  .venv311/bin/python -m hl_control.eval.run_platooning \
+  --controller candidate_0002 \
+  --scenario hard_combo_v1 \
+  --seeds "${SEEDS[@]}" \
+  --output-root experiments/platooning_seed_sweep/candidate_0002
+```
+
+The tuned robust CACC run was:
+
+```bash
+PYTHONPATH=src .venv311/bin/python -m hl_control.eval.tune_platooning_optuna \
+  --controller-family shared \
+  --scenario hard_combo_v1 \
+  --n-trials 400 \
+  --n-jobs 4 \
+  --sampler-seed 2 \
+  --output-dir experiments/platooning_optuna_robust_cacc_shared
+```
+
+It wrote:
+
+```text
+experiments/platooning_optuna_robust_cacc_shared/20260613-115427-591661
+```
+
+The fresh-seed sweep for the tuned baseline used the frozen parameters from that run:
+
+```bash
+PYTHONPATH=src .venv311/bin/python -m hl_control.eval.run_platooning \
+  --controller optuna_robust_cacc_shared \
+  --scenario hard_combo_v1 \
+  --controller-params-json experiments/platooning_optuna_robust_cacc_shared/20260613-115427-591661/best_params.json \
+  --seeds "${SEEDS[@]}" \
+  --output-root experiments/platooning_seed_sweep/optuna_robust_cacc_shared
+```
