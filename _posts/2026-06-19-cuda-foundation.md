@@ -11,6 +11,18 @@ toc:
   sidebar: left
 ---
 
+<style>
+  #markdown-content img[src*="/assets/img/cuda-foundation/"] {
+    display: block;
+    width: auto;
+    max-width: min(100%, 860px);
+    max-height: 72vh;
+    height: auto;
+    margin: 1.5rem auto;
+    object-fit: contain;
+  }
+</style>
+
 # CUDA foundation
 
 ![Screenshot 2026-05-09 at 17.42.37.png]({{ '/assets/img/cuda-foundation/Screenshot_2026-05-09_at_17.42.37.png' | relative_url }})
