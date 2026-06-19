@@ -37,7 +37,18 @@ ninja.data = [{
               handler: () => {
                 window.location.href = "/blog/";
               },
-            },{id: "post-from-lunarlander-to-string-stable-platooning",
+            },{id: "post-cuda-foundation",
+        
+          title: "CUDA foundation",
+        
+        description: "Notes on CUDA hardware, memory architecture, coalescing, shared memory, atomics, warps, streams, and error checking.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/cuda-foundation/";
+          
+        },
+      },{id: "post-from-lunarlander-to-string-stable-platooning",
         
           title: "From LunarLander to String-Stable Platooning",
         
