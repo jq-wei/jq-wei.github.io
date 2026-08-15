@@ -26,7 +26,6 @@ toc:
   }
 </style>
 
-> **The matrix multiplication never changed. The way the GPU was orchestrated did.**
 
 How much control can a Python DSL give us without giving up GPU performance?
 
