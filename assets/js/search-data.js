@@ -37,7 +37,29 @@ ninja.data = [{
               handler: () => {
                 window.location.href = "/blog/";
               },
-            },{id: "post-cuda-foundation",
+            },{id: "post-tirx-gemm-detailed-technical-notes",
+        
+          title: "TIRx GEMM - Detailed Technical Notes",
+        
+        description: "Detailed technical notes for the nine-stage TIRx GEMM optimization journey on NVIDIA Blackwell.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/tirx-gemm-detailed-technical-notes/";
+          
+        },
+      },{id: "post-python-syntax-ptx-level-control-a-gemm-at-98-of-cublas-on-blackwell",
+        
+          title: "Python Syntax, PTX-Level Control - A GEMM at 98% of cuBLAS on Blackwell...",
+        
+        description: "A nine-stage TIRx GEMM optimization journey on NVIDIA B200, reaching 97.9% of cuBLAS throughput.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/tirx-gemm-blackwell/";
+          
+        },
+      },{id: "post-cuda-foundation",
         
           title: "CUDA foundation",
         
