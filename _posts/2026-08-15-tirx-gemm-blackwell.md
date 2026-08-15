@@ -82,7 +82,7 @@ So “Python syntax” does NOT mean automatic optimization. The syntax is Pytho
 
 That is exactly what made it useful to learn.
 
-# The Blackwell path, in one picture
+# The Blackwell data path
 
 For this GEMM, A and B normally travel through global memory and shared memory before the Tensor Core consumes them. Blackwell changes the accumulator path: `tcgen05.mma` writes the long-lived FP32 accumulator into Tensor Memory, or TMEM, instead of keeping it in ordinary registers.
 
@@ -104,7 +104,7 @@ A few execution scopes appear in the same kernel:
 
 It is important to see that a fast kernel is a coordination system around the Tensor Core. The Tensor Core may perform the arithmetic, but it can only run when the right bytes are in the right memory layout and all dependencies are satisfied.
 
-# Nine kernels, three acts
+# Nine optimizations
 
 ![]({{ '/assets/img/tirx-gemm/tirx_gemm_optimization_timeline.svg' | relative_url }})
 
@@ -124,7 +124,7 @@ It is important to see that a fast kernel is a coordination system around the Te
 > **Comparison note:** V1 and V2 use their native teaching shapes, so their latency and TFLOP/s are not directly comparable with V3-V9. The meaningful full-matrix journey starts at V3.
 {: .block-warning }
 
-## Act I: Make it correct, then make it cover the problem
+## Act I: Make it correct first, then scale up the matrices
 
 ### V1: One tile, one path
 
@@ -156,9 +156,9 @@ Each CTA owns one `128 × 128` output tile. The GPU runs those logical CTAs in w
 
 This is the first version directly comparable with the later kernels. It reaches **266.9 TFLOP/s**. The kernel now has enough parallel work, but each CTA still performs load, compute, and writeback in a sequential way.
 
-## Act II: Stop making the Tensor Core wait
+## Act II: Stop making the Tensor Core wait by using double buffer
 
-### V4: Let TMA move the tiles
+### V4: Let TMA move the tiles rather than multiple threads
 
 V4 replaces thread-by-thread operand movement with the Tensor Memory Accelerator (TMA).
 
@@ -188,7 +188,7 @@ V5: 521.3 TFLOP/s
 
 Almost 2× came from overlapping movement with compute, not from changing the matrix multiplication.
 
-### V6: Keep CTAs alive
+### V6: Keep CTAs persistent
 
 V5 launches one CTA for every output tile. For this shape, that means 1,024 CTAs. Every CTA initializes barriers, allocates TMEM, computes one tile, and exits.
 
@@ -273,7 +273,7 @@ Throughput reaches **1,263.9 TFLOP/s**, or **97.9% of the cuBLAS reference**.
 
 The last gain did not come from moving B faster, but came from getting more useful compute from the B tile that was already staged.
 
-# What the timing actually measured
+# Latency measurement
 
 ![]({{ '/assets/img/tirx-gemm/tirx_gemm_latency_journey.svg' | relative_url }})
 
