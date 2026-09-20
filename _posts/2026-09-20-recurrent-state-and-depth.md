@@ -206,7 +206,7 @@ I-\beta_tk_tk_t^\top
 \beta_tv_tk_t^\top
 $$
 
-Here, $\beta_t\in(0,1)$ controls the ‘writing strength’.  DeltaNet provides a key-specific correction: it changes the memory primarily along the direction represented by $k_t$.
+Here, $\beta_t\in(0,1)$ controls the ‘writing strength’. DeltaNet provides a key-specific correction: it changes the memory primarily along the direction represented by $k_t$.
 
 ## 5. From DeltaNet to Gated DeltaNet
 
@@ -302,13 +302,13 @@ The architecture can be shown as follows.
 
 I compared **Qwen3.5-35B-A3B-FP8** with **Qwen3-30B-A3B-FP8** on one A100-SXM4-80GB using vLLM 0.18.0. Qwen3.5 contains 30 GDN layers and 10 full-attention layers, while the Qwen3 baseline contains 48 full-attention layers. Since they are separately trained models, here we are looking for a practical systems comparison, not an ablation.
 
-| Context | Qwen3.5 | Qwen3 | Cache saving | TTFT speedup |
-| --- | --- | --- | --- | --- |
-| 1K | 81.4 MiB | 96 MiB | 15.2% | 0.75x |
-| 4K | 141.4 MiB | 384 MiB | 63.2% | 1.04x |
-| 8K | 221.4 MiB | 768 MiB | 71.2% | 1.17x |
-| 16K | 381.4 MiB | 1,536 MiB | 75.2% | 1.37x |
-| 32K | 701.4 MiB | 3,072 MiB | 77.2% | 1.69x |
+| Context | Qwen3.5   | Qwen3     | Cache saving | TTFT speedup |
+| ------- | --------- | --------- | ------------ | ------------ |
+| 1K      | 81.4 MiB  | 96 MiB    | 15.2%        | 0.75x        |
+| 4K      | 141.4 MiB | 384 MiB   | 63.2%        | 1.04x        |
+| 8K      | 221.4 MiB | 768 MiB   | 71.2%        | 1.17x        |
+| 16K     | 381.4 MiB | 1,536 MiB | 75.2%        | 1.37x        |
+| 32K     | 701.4 MiB | 3,072 MiB | 77.2%        | 1.69x        |
 
 The following figures show attention-cache scaling and system performance as context length increases.
 
@@ -354,7 +354,7 @@ $$
 
 ![Huginn recurrent-depth architecture]({{ '/assets/img/recurrent-state-depth/huginn-recurrent-depth-architecture.png' | relative_url }})
 
-*Figure. Huginn's Prelude-Core-Coda architecture. The Prelude computes the input representation $e$ once; every shared recurrent block receives both the evolving state $s_{i-1}$ and the same input representation $e$; the Coda decodes the final state $s_r$.*
+<em>Figure. Huginn's Prelude-Core-Coda architecture. The Prelude computes the input representation $e$ once; every shared recurrent block receives both the evolving state $s_{i-1}$ and the same input representation $e$; the Coda decodes the final state $s_r$.</em>
 
 The original input representation is injected into every recurrence:
 
@@ -440,7 +440,7 @@ A smaller $q$ favors lower latency; a larger $q$ permits more latent computation
 ### Main Engineering Challenge
 
 Adaptive depth creates a variable execution path. Different requests—and potentially different tokens—may stop after different numbers of loops. For example, easy request may exit after loop 1, while more difficult ones may need full loop 4. GPU inference systems obtain high utilization by batching requests through the same kernels, CUDA graphs, and predictable KV-cache operations. Dynamic exits can cause the batch to diverge.
-Padding every request to the deepest loop removes most of the speed benefit, while repeatedly splitting or compacting batches introduces scheduling overhead and fragmentation. Current  inference frameworks are much better suited to a fixed loop count than true token-level adaptive recurrence.
+Padding every request to the deepest loop removes most of the speed benefit, while repeatedly splitting or compacting batches introduces scheduling overhead and fragmentation. Current inference frameworks are much better suited to a fixed loop count than true token-level adaptive recurrence.
 
 ### Fixed-Exit Smoke Test
 
@@ -457,11 +457,11 @@ $$
 The same checkpoint was decoded from each fixed recurrent state:
 
 | `exit_at_step` | Recurrences represented by selected state | Effective depth | Generated answer |
-| --- | --- | --- | --- |
-| 0 | 1 | 24 layers | 10 |
-| 1 | 2 | 48 layers | 31 |
-| 2 | 3 | 72 layers | 35 |
-| 3 | 4 | 96 layers | 35 |
+| -------------- | ----------------------------------------- | --------------- | ---------------- |
+| 0              | 1                                         | 24 layers       | 10               |
+| 1              | 2                                         | 48 layers       | 31               |
+| 2              | 3                                         | 72 layers       | 35               |
+| 3              | 4                                         | 96 layers       | 35               |
 
 The first two recurrent states produce incorrect answers. The third recurrence changes the answer to the correct value, and the fourth retains it. This is a concrete example of latent recurrent depth improving a prediction without adding visible Chain-of-Thought tokens.
 
