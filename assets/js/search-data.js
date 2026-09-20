@@ -37,7 +37,18 @@ ninja.data = [{
               handler: () => {
                 window.location.href = "/blog/";
               },
-            },{id: "post-tirx-gemm-detailed-technical-notes",
+            },{id: "post-recurrent-state-and-depth-two-new-llm-architectures",
+        
+          title: "Recurrent State and Depth: Two ‘new’ LLM Architectures",
+        
+        description: "Notes and hands-on experiments on recurrent-state hybrid attention and recurrent-depth looped Transformers.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/recurrent-state-and-depth/";
+          
+        },
+      },{id: "post-tirx-gemm-detailed-technical-notes",
         
           title: "TIRx GEMM - Detailed Technical Notes",
         
