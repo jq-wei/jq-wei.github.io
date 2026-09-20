@@ -33,6 +33,12 @@ toc:
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
+
+  @media (max-width: 575.98px) {
+    #toc-sidebar {
+      display: none;
+    }
+  }
 </style>
 
 # From Traditional Attention to hybrid ones
