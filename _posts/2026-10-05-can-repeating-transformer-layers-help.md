@@ -44,6 +44,20 @@ toc:
     overflow-y: hidden;
   }
 
+  #markdown-content th:first-child,
+  #markdown-content td:first-child {
+    min-width: 12rem;
+  }
+
+  #markdown-content td:not(:first-child) {
+    white-space: nowrap;
+  }
+
+  footer.fixed-bottom {
+    position: static;
+    margin-top: 3rem;
+  }
+
   @media (max-width: 575.98px) {
     #toc-sidebar {
       display: none;
@@ -61,8 +75,7 @@ Most of the existing work on looped transformer is about full attention model, h
 
 Qwen3.5-0.8B architecture with frozen front and tail, trained middle layers, and a new trained bridge are given as following figure. The notation is consistent with \[9\].
 
-![Qwen3.5-0.8B architecture with frozen front and tail, trained middle layers, and a new trained bridge](/assets/img/looped-transformer/01_trainable_layers.png)
-{: .img-fluid data-zoomable="true"}
+![Qwen3.5-0.8B architecture with frozen front and tail, trained middle layers, and a new trained bridge](/assets/img/looped-transformer/01_trainable_layers.png){: .img-fluid data-zoomable="true"}
 
 _Green: pretrained layers being trained. Orange: the new bridge to merge two input tensors. Grey: frozen weights. Layer indices are zero-based. The two middle blocks share weights._
 
@@ -75,8 +88,7 @@ One training example was:
 
 Both models learned with the following training loss.
 
-![Arithmetic training loss for one-pass and two-pass models](/assets/img/looped-transformer/01_arithmetic_loss.png)
-{: .img-fluid data-zoomable="true"}
+![Arithmetic training loss for one-pass and two-pass models](/assets/img/looped-transformer/01_arithmetic_loss.png){: .img-fluid data-zoomable="true"}
 
 But the training result is not good, two passes did not beat ordinary fine-tuning:
 
@@ -101,8 +113,7 @@ $$
 
 During training, pass (i) receives a target of $f^i(x)$. So the first pass learns the first lookup, the second learns the second lookup, and so on. Later in training, I reduced the weight of these intermediate targets and finished with only the final-answer loss. Six passes through shared trained layers, with a frozen readout and a separate target at each pass.<br><br>The training process is described in the following plot.
 
-![](/assets/img/looped-transformer/02_intermediate_supervision.png)
-{: .img-fluid data-zoomable="true"}
+![A six-step training example](/assets/img/looped-transformer/02_intermediate_supervision.png){: .img-fluid data-zoomable="true"}
 
 _A six-step training example. Shorter (than 6-steps) questions supervise only the passes up to the requested step. The letters are targets, not text fed into the next pass. Here I used a different bridge: learned projections of the previous state and the saved front output, with a learned scalar blend. It is NOT an trainable early-exit gate._
 
@@ -112,8 +123,7 @@ One finding I got is that training on up to four steps did not make the model re
 
 Rule-following accuracy by number of required steps
 
-![Rule-following accuracy by number of required steps](/assets/img/looped-transformer/02_rule_following.png)
-{: .img-fluid data-zoomable="true"}
+![Rule-following accuracy by number of required steps](/assets/img/looped-transformer/02_rule_following.png){: .img-fluid data-zoomable="true"}
 
 _128 questions at each length. The shaded region covers lengths seen during training._
 
@@ -152,8 +162,7 @@ Two models are compared here: the model that had already learned the previous ta
 
 Accuracy on new wording across three training runs
 
-![Accuracy on new wording across three training runs](/assets/img/looped-transformer/03_new_wording.png)
-{: .img-fluid data-zoomable="true"}
+![Accuracy on new wording across three training runs](/assets/img/looped-transformer/03_new_wording.png){: .img-fluid data-zoomable="true"}
 
 _Each run tested 256 new questions requiring seven or eight steps._
 
@@ -184,8 +193,8 @@ $$
 \begin{aligned}
 x_0 &= x,\\
 x_{j+1} &= x_j+\frac{1}{K}\bigl(g(x_j)-x_j\bigr)\\
-&=\left(1-\frac{1}{K}\right)x_j+\frac{1}{K}g(x_j),
-\qquad j=0,\ldots,K-1.
+&=\left(1-\frac{1}{K}\right)x_j+\frac{1}{K}g(x_j),\\
+&\qquad j=0,\ldots,K-1.
 \end{aligned}
 $$
 
@@ -199,8 +208,7 @@ I tested above train-free achitecture on [Qwen3.8-27B](https://huggingface.co/Qw
 
 Training-free Qwen3.8-27B with all weights frozen and three fixed blended updates through layers 30-33
 
-![Training-free Qwen3.8-27B with all weights frozen and three fixed blended updates through layers 30-33](/assets/img/looped-transformer/03_training_free_hybrid.png)
-{: .img-fluid data-zoomable="true"}
+![Training-free Qwen3.8-27B with all weights frozen and three fixed blended updates through layers 30-33](/assets/img/looped-transformer/03_training_free_hybrid.png){: .img-fluid data-zoomable="true"}
 
 _All weights stay frozen. Purple is a fixed weighted sum, not a learned bridge. The repeated window contains three GDN layers and one full-attention layer; both types receive the extra computation._
 
@@ -230,20 +238,20 @@ There are two methods discussed in this paper.
 
 1. For the same input prefix and next token, let $z_1$ be the first pass’s vocabulary scores and $z_R$ the final pass’s scores. LoopCD-Logits adjusts them as:
 
-$$
-\begin{aligned}
-z_{\mathrm{guided}} &= z_R+\omega(z_R-z_1),\\
-p_{\mathrm{guided}} &= \operatorname{softmax}(z_{\mathrm{guided}}).
-\end{aligned}
-$$
+   $$
+   \begin{aligned}
+   z_{\mathrm{guided}} &= z_R+\omega(z_R-z_1),\\
+   p_{\mathrm{guided}} &= \operatorname{softmax}(z_{\mathrm{guided}}).
+   \end{aligned}
+   $$
 
-The parameter $\omega$ is called strength. The idea is to amplify the change made by the extra passes. With $\omega=0$, this uses the final pass's logits without guidance; the loops still run. This contrasts predictions for the same token, rather than averaging different generated answers.
+   The parameter $\omega$ is called strength. The idea is to amplify the change made by the extra passes. With $\omega=0$, this uses the final pass's logits without guidance; the loops still run. This contrasts predictions for the same token, rather than averaging different generated answers.
 
 2. LoopCD-Hidden instead combines the hidden states before the remaining layers and output head:
 
-$$
-h_{\mathrm{guided}}=h_R+\omega(h_R-h_1).
-$$
+   $$
+   h_{\mathrm{guided}}=h_R+\omega(h_R-h_1).
+   $$
 
 The logits version needs an extra readout of the earlier state. The hidden-state version keeps one readout, adding only a small vector operation.
 
