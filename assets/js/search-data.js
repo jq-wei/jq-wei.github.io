@@ -37,7 +37,18 @@ ninja.data = [{
               handler: () => {
                 window.location.href = "/blog/";
               },
-            },{id: "post-recurrent-state-and-depth-two-new-llm-architectures",
+            },{id: "post-can-repeating-transformer-layers-help",
+        
+          title: "Can Repeating Transformer Layers Help?",
+        
+        description: "Repeating a block adds computation without adding another copy of its weights.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/can-repeating-transformer-layers-help/";
+          
+        },
+      },{id: "post-recurrent-state-and-depth-two-new-llm-architectures",
         
           title: "Recurrent State and Depth: Two ‘new’ LLM Architectures",
         
