@@ -1,0 +1,25 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>cart-link-swingup</title><link rel=stylesheet href='../style.css'></head><body><main><p><a href='../index.html'>&larr; all tasks</a></p><h1>cart-link-swingup</h1><p class=sub>Cart-link swing-up · <span class='tag good'>solved</span> 10 of 10 agent attempts pass</p><div class=box><p class=meta><b>The task.</b> Hard tier in June: eleven from-scratch harness runs (120 proposals) failed before the first passing controller.</p><details><summary class=note>more</summary><p class=note>The May reference leaves the track; the June controller is the oracle.</p></details><p class=note><b>Gate.</b> |wrapped theta| &lt;= 0.18, |theta_dot| &lt;= 0.7, |x| &lt;= 0.35, |x_dot| &lt;= 0.7 for 25 consecutive steps within 700 steps; success rate &gt;= 0.9 on 40 verifier-only seeds</p><p class=note>Axes: <code>dynamics:cart-pole-swingup</code>, <code>constraint:track-limit</code>, <code>actuation:force-limited</code>, <code>n_agents:1</code></p></div><p class=note>Each video re-runs the attempt's final controller through the task's own evaluator on a public seed (never the grader's held-out ones). The table under each video is the official grade on the held-out seeds.</p><div class=clips><div class=card><video controls muted loop playsinline preload=metadata poster='../media/cart-link-swingup/SLrW7Fu__cart-link-swingup__best__base.jpg' src='../media/cart-link-swingup/SLrW7Fu__cart-link-swingup__best__base.mp4'></video><div class=body><span class='tag good'>Best attempt</span><b>Gemini</b> <span class=muted>(cursor-cli (pre-clock), 16 min)</span> · <code>base</code><p class=meta>Graded on the held-out seeds: passes every gate on the grader&#x27;s held-out seeds.</p><table><tr><th>criterion</th><th>graded</th><th>needed</th></tr><tr><td>base:success</td><td class=good>1.000</td><td class=muted>&ge; 0.900</td></tr></table><p class=meta><b>How the agent got there:</b> 16 min · 54 tool calls · 1 edit-tool edits · 18 runs of its own Python (tests, experiments, rewrites) · no tuner runs · official verifier 5&times; (success rates in order: 0.00, 1.00, 1.00, 1.00, 1.00).</p><details><summary class=note>The agent's final message</summary><p class=note>The controller for the cart-link swing-up problem on a bounded track has been implemented and verified in `/app/work/controller.py`.
+
+### Control Strategy
+
+The controller combines two complementary nonlinear and optimal control techniques:
+
+1. **Energy-Shaping Swing-Up with Exact Partial Feedback Linearization:**
+   - Computes total mechanical energy of the pole relative to the upright reference $E_0 = 0$:
+     \[
+     E(\theta, \dot{\theta}) = \frac{1}{2} J \dot{\theta}^2 + m g l (\cos\theta - 1)
+     \]
+   - Calculates energy error $\Delta E = E - E_0$ and applies pumping acceleration proportional to $\Delta E \cdot \text{sign}(\dot{\theta} \cos\theta)$ with initial symmetry breaking.
+   - Adds PD cart centering ($-K_{px} x - K_{dx} \dot{x}$) to keep cart motion bounded within the track ($|x| \le 1.4 \ll 2.4$).
+   - Computes the horizontal actuator force $F$ matching desired acceleration $a_{\text{des}}$ via exact partial feedback linearization.
+
+2. **Discrete-Time Linear Quadratic Regulator (DLQR) Catch &amp; Stabilization:**
+   - Switches to DLQR when the link enters the basin of attraction ($|\theta| &lt; 0.45\text{ rad}$, $|\dot{\theta}| &lt; 2.5\text{ rad/s}$).
+   - DLQR gains $K_{\text{LQR}}$ stabilize $x \to 0, \dot{x} \to 0, \theta \to 0, \dot{\theta} \to 0$ with high convergence precision and zero steady-state error.
+
+```101:144:/app/work/controller.py
+def controller(obs: dict) -&gt; np.ndarray:
+    &quot;&quot;&quot;Compute the horizontal force action for the cart-link system.
+
+    Args:
+   …</p></details><p class=meta>Controller family: <b>energy-based swing-up + LQR catch</b></p><p class=note>Far from upright, it pumps pendulum energy toward the upright level by commanding a clipped cart acceleration (sign(theta_dot*cos theta) times energy error plus PD centering) converted to force via partial feedback linearization, then switches to a precomputed discrete LQR when the pole is within 0.45 rad and 2.5 rad/s of upright.</p><p class=note>Shown: public seed 0 (base); this episode <span class=good>passes</span> the <code>default</code> rung. This episode: <code>final_upright_error</code> 1.85e-11, <code>final_abs_x</code> 1.18e-10, <code>max_track_violation</code> 0, <code>success_hold_steps</code> 25, <code>total_reward</code> 573.</p><p class=note><a href='../../../harbor/jobs/sweep-hard/cart-link-swingup__SLrW7Fu/artifacts/app/work/controller.py'>controller.py</a> · trial <code>cart-link-swingup__SLrW7Fu</code></p></div></div></div></main></body></html>
