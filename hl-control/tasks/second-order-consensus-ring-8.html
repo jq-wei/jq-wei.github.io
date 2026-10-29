@@ -1,0 +1,22 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>second-order-consensus-ring-8</title><link rel=stylesheet href='../style.css'></head><body><main><p><a href='../index.html'>&larr; all tasks</a></p><h1>second-order-consensus-ring-8</h1><p class=sub>Second-order consensus · <span class='tag good'>solved</span> 13 of 13 agent attempts pass</p><div class=box><p class=meta><b>The task.</b> Textbook (neighbour PD). The reference with May gains (1.0, 1.5) passes only 0.73 of seeds within the horizon; gains (1.5, 2.0) pass 40/40, so gain tuning matters.</p><p class=note><b>Gate.</b> final error (edge disagreement in position + 0.25 * edge disagreement in velocity) &lt;= 1e-3 after 300 steps; success rate &gt;= 0.9 on 40 verifier-only seeds</p><p class=note>Axes: <code>topology:ring</code>, <code>n_agents:8</code>, <code>dynamics:double-integrator</code></p></div><p class=note>Each video re-runs the attempt's final controller through the task's own evaluator on a public seed (never the grader's held-out ones). The table under each video is the official grade on the held-out seeds.</p><div class=clips><div class=card><video controls muted loop playsinline preload=metadata poster='../media/second-order-consensus-ring-8/N7GMi8U__second-order-consensus-ring-8__best__base.jpg' src='../media/second-order-consensus-ring-8/N7GMi8U__second-order-consensus-ring-8__best__base.mp4'></video><div class=body><span class='tag good'>Best attempt</span><b>Gemini</b> <span class=muted>(cursor-cli (pre-clock), 7 min)</span> · <code>base</code><p class=meta>Graded on the held-out seeds: passes every gate on the grader&#x27;s held-out seeds.</p><table><tr><th>criterion</th><th>graded</th><th>needed</th></tr><tr><td>base:success</td><td class=good>1.000</td><td class=muted>&ge; 0.900</td></tr></table><p class=meta><b>How the agent got there:</b> 7 min · 38 tool calls · 2 edit-tool edits · 16 runs of its own Python (tests, experiments, rewrites) · no tuner runs · official verifier 3&times; (success rates in order: 0.00, 1.00, 1.00).</p><details><summary class=note>The agent's final message</summary><p class=note>The distributed second-order consensus controller has been implemented in `/app/work/controller.py`.
+
+### Control Law &amp; Gain Rationale
+
+For each agent \(i\) interacting with its immediate neighbors \(\mathcal{N}_i\) on the ring graph, the distributed control action is:
+\[
+u_i = - k_p \sum_{j \in \mathcal{N}_i} A_{ij}(p_i - p_j) - k_v \sum_{j \in \mathcal{N}_i} A_{ij}(v_i - v_j) = -k_p (L p)_i - k_v (L v)_i
+\]
+where \(L = D - A\) is the graph Laplacian.
+
+- **Proportional Gain (\(k_p = 6.0\))**: Penalizes relative position disagreements between adjacent agents, providing the restorative spring stiffness needed to converge to agreement.
+- **Velocity Gain (\(k_v = 4.0\))**: Penalizes relative velocity disagreements, providing viscous damping to eliminate oscillatory modes and align velocities smoothly.
+- **Stability &amp; Saturation**: With sample time \(\Delta t = 0.05\,\text{s}\) and graph spectrum \(\lambda_{\max} = 4.0\), the closed-loop discrete-time eigenvalues remain well inside the unit circle while respecting the \([-2, 2]\) control saturation limits.
+
+### Verification Results
+
+Evaluated against the verification benchmark:
+- **Success rate**: 100% (`solved=True`, 1.000 across visible and hold-out seed evaluations)
+- **Mean final consensus error**: \(\sim 2.83 \times 10^{-16}\) (well below threshold \(10^{-3}\))The distributed second-order consensus controller in `/app/work/controller.py` is configured and validated.
+
+### Summary of Results
+- **Controller Law**: Distributed n…</p></details><p class=meta>Controller family: <b>consensus protocol</b></p><p class=note>Each agent applies u = -k_p*L@p - k_v*L@v with fixed gains 6.0 and 4.0 using the graph Laplacian, then clips the result to the action limit.</p><p class=note>Shown: public seed 0 (base); this episode <span class=good>passes</span> the <code>default</code> rung. This episode: <code>final_error</code> 9.35e-16, <code>final_position_error</code> 8.94e-16, <code>final_velocity_error</code> 1.65e-16, <code>total_reward</code> -70.3.</p><p class=note><a href='../../../harbor/jobs/sweep-easy/second-order-consensus-ring-8__N7GMi8U/artifacts/app/work/controller.py'>controller.py</a> · trial <code>second-order-consensus-ring-8__N7GMi8U</code></p></div></div></div></main></body></html>
