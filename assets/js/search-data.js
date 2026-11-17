@@ -37,7 +37,18 @@ ninja.data = [{
               handler: () => {
                 window.location.href = "/blog/";
               },
-            },{id: "post-can-repeating-transformer-layers-help",
+            },{id: "post-post-train-with-skyrl-build-model-and-basic-training-loop",
+        
+          title: "Post-train with SkyRL: Build Model and Basic Training Loop",
+        
+        description: "How SkyRL puts the policy, reference and critic models on N GPUs with Ray actor groups, and how the trainer reaches them through WorkerDispatch.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/blog/2026/skyrl-build-models-training-loop/";
+          
+        },
+      },{id: "post-can-repeating-transformer-layers-help",
         
           title: "Can Repeating Transformer Layers Help?",
         
