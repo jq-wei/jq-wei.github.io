@@ -74,16 +74,19 @@ The decorator form `@ray.remote` is the same thing; SkyRL uses the call form so 
 
 ```mermaid
 flowchart TB
-    BM["RayPPOTrainer.build_models(PolicyWorker, CriticWorker, RefWorker)<br/>trainer.py:723"]
-    BM --> G1["PPORayActorGroup(cfg, nodes, gpus, PolicyWorker, pg, num_gpus_per_actor)<br/>worker.py:800"]
-    BM --> G2["PPORayActorGroup(..., RefWorker, ...)"]
-    BM --> G3["PPORayActorGroup(..., CriticWorker, ...)  (optional)"]
-    G1 --> I1["_initiate_actors<br/>worker.py:854"]
-    I1 --> R0["rank 0:  ray_actor_type.options(...).remote(rank=0, master_addr=None)<br/>line 920"]
-    I1 --> RN["rank 1..N-1:  same call with master_addr/port read back from rank 0<br/>lines 933–957"]
-    I1 --> PG["init_worker_process_group.remote() on all handles → torch.distributed world<br/>line 961"]
-    BM --> INIT["async_init_model → init_model.remote() on every actor<br/>trainer.py:868–914"]
-    BM --> D["WorkerDispatch(policy, critic, ref, inference_client)<br/>trainer.py:921"]
+    BM["RayPPOTrainer.build_models<br/>(PolicyWorker, CriticWorker, RefWorker)<br/>trainer.py:723"]
+    G["PPORayActorGroup(cfg, nodes, gpus, ActorClass, pg, num_gpus_per_actor)<br/>once per role: PolicyWorker · RefWorker · CriticWorker (optional)<br/>worker.py:800"]
+    subgraph EACH["inside each PPORayActorGroup"]
+        I1["_initiate_actors<br/>worker.py:854"]
+        R0["rank 0: ray_actor_type.options(...)<br/>.remote(rank=0, master_addr=None)<br/>worker.py:921"]
+        RN["ranks 1..N-1: same call with<br/>master_addr/port read back from rank 0<br/>worker.py:933–957"]
+        PG["init_worker_process_group.remote() on all handles<br/>→ one torch.distributed world<br/>worker.py:961"]
+        I1 --> R0 --> RN --> PG
+    end
+    INIT["async_init_model → init_model.remote()<br/>on every actor<br/>trainer.py:868–914"]
+    D["WorkerDispatch(policy, critic, ref, inference_client)<br/>trainer.py:921"]
+    BM --> G --> I1
+    PG --> INIT --> D
 ```
 
 The place to set up models starts with the method `build_models` in `trainer.py`.
