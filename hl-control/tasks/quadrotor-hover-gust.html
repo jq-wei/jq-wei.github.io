@@ -1,0 +1,49 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>quadrotor-hover-gust</title><link rel=stylesheet href='../style.css'></head><body><main><p><a href='../index.html'>&larr; all tasks</a></p><h1>quadrotor-hover-gust</h1><p class=sub>Quadrotor in gusts (Skydio X2, MuJoCo) · <span class='tag good'>solved</span> 6 of 6 agent attempts pass</p><div class=box><p class=meta><b>The task.</b> Sanity tier of the quadrotor family: textbook material, expected to be solved in every session.</p><details><summary class=note>more</summary><p class=note>Quadrotor commanded at the level of its four rotor thrusts (Skydio X2 of MuJoCo Menagerie, 30 ms motor lag); gyroscope and accelerometer with bias and noise, position and yaw from a 50 Hz tracker 30 ms late, no velocity or attitude; mass (+-10 %), thrust coefficient (+-5 %) and centre of mass drawn per seed and hidden; 3-6 m/s wind with Dryden turbulence (MIL-F-8785C low-altitude model). Gate: error from the setpoint &lt;= 0.25 m after 4 s on 0.9 of the seeds, on the base scenario and on four perturbations (mass +-20 %, thrust -15 %, motor lag 60 ms, wind 8-11 m/s). Measured on 40 fresh seeds: the solution holds 40/40 on the base scenario and 40/40, 40/40, 40/40, 39/40 on the perturbations (and reaches the tight rung, RMS &lt;= 0.05 m, on 40/40); an LQR on the hover linearisation without integral action holds 38/40 base seeds; the zero-thrust starter 0/40. There is no trained RL incumbent for this plant.</p></details><p class=note><b>Gate.</b> per-seed success is the `hold` rung of this benchmark&#x27;s ladder [&#x27;airborne&#x27;, &#x27;coarse&#x27;, &#x27;hold&#x27;, &#x27;tight&#x27;] (`--success-mode hold`), not the evaluator&#x27;s default flag; the task is solved when the success rate over the grader&#x27;s held-out seeds is `&gt;= 0.9`; the same gate must also hold on the sibling scenario(s) `mass_v1`, `weak_thrust_v1`, `slow_motor_v1`, `windy_v1` (`--scenarios`)</p><p class=note>Axes: <code>plant:quadrotor</code>, <code>task:hover</code>, <code>scenario:nominal_v0</code>, <code>gate:hold_0.25m</code>, <code>suite:mass+thrust+motor+wind</code>, <code>tier:sanity</code></p></div><p class=note>Each video or figure re-runs the attempt's final controller through the task's own evaluator on a public seed (never the grader's held-out ones). The table under each one is the official grade on the held-out seeds.</p><div class=clips><div class=card><video controls muted loop playsinline preload=metadata poster='../media/quadrotor-hover-gust/LYtPqxE__quadrotor-hover-gust__best__nominal_v0.jpg' src='../media/quadrotor-hover-gust/LYtPqxE__quadrotor-hover-gust__best__nominal_v0.mp4'></video><div class=body><span class='tag good'>Best attempt</span><b>Fable 5.2</b> <span class=muted>(claude-code (effort max), 32 min)</span> · <code>nominal_v0</code><p class=meta>Graded on the held-out seeds: passes every gate on the grader&#x27;s held-out seeds.</p><table><tr><th>criterion</th><th>graded</th><th>needed</th></tr><tr><td>base:hold</td><td class=good>1.000</td><td class=muted>&ge; 0.900</td></tr><tr><td>scenario:mass_v1</td><td class=good>1.000</td><td class=muted>&ge; 0.900</td></tr><tr><td>scenario:weak_thrust_v1</td><td class=good>1.000</td><td class=muted>&ge; 0.900</td></tr><tr><td>scenario:slow_motor_v1</td><td class=good>1.000</td><td class=muted>&ge; 0.900</td></tr><tr><td>scenario:windy_v1</td><td class=good>1.000</td><td class=muted>&ge; 0.900</td></tr></table><p class=meta><b>How the agent got there:</b> 32 min · 37 tool calls · 3 edit-tool edits · 23 runs of its own Python (tests, experiments, rewrites) · no tuner runs · official verifier 6&times; (success rates in order: 1.00, 1.00, 1.00, 1.00, 1.00, 1.00).</p><details><summary class=note>The agent's final message</summary><p class=note>The controller at `/app/work/controller.py` passes the `hold` gate on every graded scenario, with 0 failures in 200 fresh-seed episodes through the official evaluator. I stopped at about 31 of the 60 minutes because it already passes with wide margin.
+
+## Results
+
+Official evaluator, seeds 600–639 (not used for tuning), final file:
+
+| Scenario | hold rate | tight rate | worst hold error (limit 0.25 m) |
+|---|---|---|---|
+| `nominal_v0` | 1.00 | 1.00 | 0.021 m |
+| `mass_v1` | 1.00 | 1.00 | 0.020 m |
+| `weak_thrust_v1` | 1.00 | 1.00 | 0.021 m |
+| `slow_motor_v1` | 1.00 | 1.00 | 0.021 m |
+| `windy_v1` | 1.00 | 1.00 | 0.099 m |
+
+The visible seeds 0–4 also pass all four rungs in every scenario. The controller costs about 0.06 ms per call as the grader sees it, no rotor command saturates, and the import takes 0.1 s.
+
+## Control law
+
+- **Observer:** the gyro turns the attitude and the accelerometer is integrated to velocity and position, so wind needs no model. Each delayed tracker frame corrects position, velocity, tilt, yaw and sensor biases using Kalman gains precomputed at import.
+- **Air-load observer:** body x/y accelerometer readings are pure air load, so the vehicle leans into a gust as soon as it pushes, before a position error develops.
+- **Cascade:** position PID → thrust direction and collective → tilt → body rate with angular-acceleration feedback against the motor lag → mixer.
+
+## What the testing changed
+
+- **Thin-axis drag:** in strong wind the load along the body&#x27;s …</p></details><p class=note>Shown: public seed 0 (nominal_v0); this episode <span class=good>passes</span> the <code>hold</code> rung. This episode: <code>crash_reason_code</code> 0, <code>episode_time</code> 15, <code>hold_error_max</code> 0.0153, <code>hold_error_rms</code> 0.00843, <code>min_height</code> 2.99, <code>max_tilt_deg</code> 8.85, <code>wind_speed</code> 5.51. The camera rests on the set point (green). The path flown is drawn in orange; rear rotors orange, front rotors blue.</p><p class=note><a href='../media/quadrotor-hover-gust/LYtPqxE__controller.py'>controller.py</a> · trial <code>quadrotor-hover-gust__LYtPqxE</code></p></div></div><div class=card><video controls muted loop playsinline preload=metadata poster='../media/quadrotor-hover-gust/LYtPqxE__quadrotor-hover-gust__best__mass_v1.jpg' src='../media/quadrotor-hover-gust/LYtPqxE__quadrotor-hover-gust__best__mass_v1.mp4'></video><div class=body><span class='tag good'>Best attempt</span><b>Fable 5.2</b> <span class=muted>(claude-code (effort max), 32 min)</span> · <code>mass_v1</code><p class=meta>Graded on the held-out seeds: passes every gate on the grader&#x27;s held-out seeds.</p><table><tr><th>criterion</th><th>graded</th><th>needed</th></tr><tr><td>base:hold</td><td class=good>1.000</td><td class=muted>&ge; 0.900</td></tr><tr><td>scenario:mass_v1</td><td class=good>1.000</td><td class=muted>&ge; 0.900</td></tr><tr><td>scenario:weak_thrust_v1</td><td class=good>1.000</td><td class=muted>&ge; 0.900</td></tr><tr><td>scenario:slow_motor_v1</td><td class=good>1.000</td><td class=muted>&ge; 0.900</td></tr><tr><td>scenario:windy_v1</td><td class=good>1.000</td><td class=muted>&ge; 0.900</td></tr></table><p class=meta><b>How the agent got there:</b> 32 min · 37 tool calls · 3 edit-tool edits · 23 runs of its own Python (tests, experiments, rewrites) · no tuner runs · official verifier 6&times; (success rates in order: 1.00, 1.00, 1.00, 1.00, 1.00, 1.00).</p><details><summary class=note>The agent's final message</summary><p class=note>The controller at `/app/work/controller.py` passes the `hold` gate on every graded scenario, with 0 failures in 200 fresh-seed episodes through the official evaluator. I stopped at about 31 of the 60 minutes because it already passes with wide margin.
+
+## Results
+
+Official evaluator, seeds 600–639 (not used for tuning), final file:
+
+| Scenario | hold rate | tight rate | worst hold error (limit 0.25 m) |
+|---|---|---|---|
+| `nominal_v0` | 1.00 | 1.00 | 0.021 m |
+| `mass_v1` | 1.00 | 1.00 | 0.020 m |
+| `weak_thrust_v1` | 1.00 | 1.00 | 0.021 m |
+| `slow_motor_v1` | 1.00 | 1.00 | 0.021 m |
+| `windy_v1` | 1.00 | 1.00 | 0.099 m |
+
+The visible seeds 0–4 also pass all four rungs in every scenario. The controller costs about 0.06 ms per call as the grader sees it, no rotor command saturates, and the import takes 0.1 s.
+
+## Control law
+
+- **Observer:** the gyro turns the attitude and the accelerometer is integrated to velocity and position, so wind needs no model. Each delayed tracker frame corrects position, velocity, tilt, yaw and sensor biases using Kalman gains precomputed at import.
+- **Air-load observer:** body x/y accelerometer readings are pure air load, so the vehicle leans into a gust as soon as it pushes, before a position error develops.
+- **Cascade:** position PID → thrust direction and collective → tilt → body rate with angular-acceleration feedback against the motor lag → mixer.
+
+## What the testing changed
+
+- **Thin-axis drag:** in strong wind the load along the body&#x27;s …</p></details><p class=note>Shown: public seed 0 (mass_v1); this episode <span class=good>passes</span> the <code>hold</code> rung. This episode: <code>crash_reason_code</code> 0, <code>episode_time</code> 15, <code>hold_error_max</code> 0.015, <code>hold_error_rms</code> 0.00831, <code>min_height</code> 2.99, <code>max_tilt_deg</code> 8.62, <code>wind_speed</code> 5.51. The camera rests on the set point (green). The path flown is drawn in orange; rear rotors orange, front rotors blue.</p><p class=note><a href='../media/quadrotor-hover-gust/LYtPqxE__controller.py'>controller.py</a> · trial <code>quadrotor-hover-gust__LYtPqxE</code></p></div></div></div></main></body></html>
